@@ -1,26 +1,38 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const Item = require("./models/Item");
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: "http://127.0.0.1:5500" }));
 app.use(express.json());
 
-// Test route
+// Routes
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Connect to MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/lostfoundDB", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+app.post("/api/items", async (req, res) => {
+  try {
+    const newItem = new Item(req.body);
+    await newItem.save();
+    res.json(newItem);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-// Start server
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.get("/api/items", async (req, res) => {
+  const items = await Item.find();
+  res.json(items);
+});
+
+// Connect to MongoDB + Start server
+mongoose.connect("mongodb+srv://raptor2322_db_user:joseph2002@cluster0.7kbwgqt.mongodb.net/?appName=Cluster0")
+  .then(() => {
+    console.log("MongoDB Connected");
+    app.listen(8000, () => console.log("Server running on port 8000")); // ← changed to 8000
+  })
+  .catch(err => console.log(err));
