@@ -1,3 +1,9 @@
+// Protect page
+const token = localStorage.getItem("token");
+if (!token) {
+  window.location.href = "login.html";
+}
+
 console.log("JS is connected");
 
 fetch("http://localhost:8000/api/items")
