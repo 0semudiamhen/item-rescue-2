@@ -1,19 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Lost and Found</title>
+  <title>CU Item Rescue</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
   <nav>
-    <span id="welcomeMsg"></span>
-    <a href="post-item.html">Post an Item</a>
-    <button id="logoutBtn">Logout</button>
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" alt="Central University Logo">
+      Item Rescue
+    </a>
+    <div class="nav-right">
+      <span id="welcomeMsg"></span>
+      <a href="post-item.html">Post an Item</a>
+      <button id="logoutBtn">Logout</button>
+    </div>
   </nav>
 
-  <h1>Lost & Found Items</h1>
+  <div class="hero">
+    <h1>Lost Something? Found Something?</h1>
+    <p>Central University's Official Lost and Found Platform</p>
+  </div>
 
-  <div id="itemsList"></div>
+  <div class="container">
+    <p class="section-title">All Items</p>
+    <p class="section-subtitle">Browse recently lost and found items on campus</p>
+    <div id="itemsList" class="items-grid"></div>
+  </div>
 
   <script src="js/items.js"></script>
   <script src="js/main.js"></script>

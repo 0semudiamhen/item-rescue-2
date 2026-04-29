@@ -1,0 +1,296 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  --red: #CC0000;
+  --dark-red: #990000;
+  --light-red: #ff4444;
+  --white: #ffffff;
+  --off-white: #f9f9f9;
+  --light-gray: #f0f0f0;
+  --gray: #888;
+  --dark: #1a1a1a;
+  --shadow: 0 4px 20px rgba(204, 0, 0, 0.15);
+  --radius: 12px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--off-white);
+  color: var(--dark);
+  min-height: 100vh;
+}
+
+/* NAVBAR */
+nav {
+  background-color: var(--red);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+nav .logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: var(--white);
+  letter-spacing: 2px;
+  text-decoration: none;
+}
+
+nav .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+nav .nav-right span {
+  color: var(--white);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+nav .nav-right a {
+  background-color: var(--white);
+  color: var(--red);
+  padding: 8px 20px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+nav .nav-right a:hover {
+  background-color: var(--dark);
+  color: var(--white);
+}
+
+nav .nav-right button {
+  background: transparent;
+  border: 2px solid var(--white);
+  color: var(--white);
+  padding: 7px 18px;
+  border-radius: 50px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+nav .nav-right button:hover {
+  background-color: var(--white);
+  color: var(--red);
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, var(--red) 0%, var(--dark-red) 100%);
+  color: var(--white);
+  padding: 60px 32px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 56px;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 32px;
+}
+
+/* CARDS */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.item-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--red);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(204, 0, 0, 0.2);
+}
+
+.item-card h3 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: var(--dark);
+}
+
+.item-card .badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.badge.lost {
+  background-color: #ffe0e0;
+  color: var(--red);
+}
+
+.badge.found {
+  background-color: #e0ffe8;
+  color: #00882b;
+}
+
+.item-card p {
+  font-size: 14px;
+  color: var(--gray);
+  margin-bottom: 6px;
+}
+
+.item-card p span {
+  font-weight: 700;
+  color: var(--dark);
+}
+
+/* FORMS */
+.form-container {
+  max-width: 480px;
+  margin: 60px auto;
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 40px;
+  box-shadow: var(--shadow);
+}
+
+.form-container h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  color: var(--red);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.form-container p.subtitle {
+  color: var(--gray);
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.form-container input,
+.form-container textarea,
+.form-container select {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border: 2px solid var(--light-gray);
+  border-radius: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  color: var(--dark);
+  background: var(--off-white);
+  transition: border 0.2s ease;
+  outline: none;
+}
+
+.form-container input:focus,
+.form-container textarea:focus,
+.form-container select:focus {
+  border-color: var(--red);
+  background: var(--white);
+}
+
+.form-container textarea {
+  height: 100px;
+  resize: none;
+}
+
+.form-container button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.form-container button[type="submit"]:hover {
+  background-color: var(--dark-red);
+}
+
+.form-container .switch-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.form-container .switch-link a {
+  color: var(--red);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* SECTION TITLE */
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 2px;
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+
+.section-subtitle {
+  color: var(--gray);
+  font-size: 15px;
+}
+
+nav .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+nav .logo img {
+  height: 40px;
+  width: auto;
+}
+
+.student-services-badge {
+  background-color: #fff3e0;
+  color: #e65100;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}

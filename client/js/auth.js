@@ -15,6 +15,13 @@ if (signupForm) {
       return;
     }
 
+    const email = document.getElementById("email").value;
+
+    if (!email.endsWith("@central.edu.gh")) {
+      alert("You must use your Central University email address (@central.edu.gh) to sign up.");
+      return;
+    }
+
     const user = {
       name: document.getElementById("name").value,
       email: document.getElementById("email").value,

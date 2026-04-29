@@ -7,6 +7,12 @@ const itemSchema = new mongoose.Schema({
   location: String,
   type: String, // lost or found
   image: String,
+  takenToStudentServices: {
+    type: Boolean,
+    default: false
+  },
+  contactType: String, // school_email, personal_email, phone
+  contactValue: String,
   createdAt: {
     type: Date,
     default: Date.now

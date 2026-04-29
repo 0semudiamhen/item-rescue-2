@@ -1,29 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Post Item</title>
+  <title>Post Item - CU Item Rescue</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-  <h2>Post Lost/Found Item</h2>
+  <nav>
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" alt="Central University Logo">
+      Item Rescue
+    </a>
+    <div class="nav-right">
+      <span id="welcomeMsg"></span>
+      <a href="index.html">Back to Items</a>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </nav>
 
-  <form id="itemForm">
-    <input type="text" id="title" placeholder="Item Title" required><br><br>
+  <div class="form-container">
+    <h2>Post an Item</h2>
+    <p class="subtitle">Report a lost or found item on campus</p>
 
-    <textarea id="description" placeholder="Description" required></textarea><br><br>
+    <form id="itemForm">
+      <input type="text" id="title" placeholder="Item Title" required>
+      <textarea id="description" placeholder="Describe the item in detail"></textarea>
+      <input type="text" id="category" placeholder="Category (e.g. Electronics, Bag, ID Card)">
+      <input type="text" id="location" placeholder="Location found or lost">
+      
+      <select id="type">
+        <option value="lost">Lost</option>
+        <option value="found">Found</option>
+      </select>
 
-    <input type="text" id="category" placeholder="Category"><br><br>
+      <!-- Student Services Option (shows only for found items) -->
+      <div id="studentServicesDiv" style="display:none;">
+        <label>
+          <input type="checkbox" id="takenToStudentServices">
+          This item has been handed to Student Services
+        </label>
+      </div>
 
-    <input type="text" id="location" placeholder="Location"><br><br>
+      <!-- Contact Preference -->
+      <p style="font-weight:700; margin-bottom:8px;">How should people contact you?</p>
+      
+      <select id="contactType">
+        <option value="school_email">My School Email</option>
+        <option value="personal_email">Personal Email</option>
+        <option value="phone">Phone Number</option>
+      </select>
 
-    <select id="type">
-      <option value="lost">Lost</option>
-      <option value="found">Found</option>
-    </select><br><br>
+      <!-- Dynamic contact input -->
+      <div id="contactInputDiv"></div>
 
-    <button type="submit">Submit</button>
-  </form>
+      <button type="submit">Submit Item</button>
+    </form>
+  </div>
 
   <script src="js/items.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
