@@ -14,6 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
     welcomeMsg.textContent = `Welcome, ${name}`;
   }
 
+  // Show admin link if user is admin and not already on admin page
+  const isAdmin = localStorage.getItem("isAdmin");
+  const onAdminPage = window.location.pathname.includes("admin.html");
+
+  if (isAdmin === "true" && !onAdminPage) {
+    const navRight = document.querySelector(".nav-right");
+    if (navRight) {
+      const adminLink = document.createElement("a");
+      adminLink.href = "admin.html";
+      adminLink.textContent = "Admin Panel";
+      navRight.insertBefore(adminLink, navRight.firstChild);
+    }
+  }
+
   // Logout
   const logoutBtn = document.getElementById("logoutBtn");
 
@@ -21,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutBtn.addEventListener("click", () => {
       localStorage.removeItem("token");
       localStorage.removeItem("name");
+      localStorage.removeItem("isAdmin");
       window.location.href = "login.html";
     });
   }

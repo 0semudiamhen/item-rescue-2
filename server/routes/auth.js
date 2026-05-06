@@ -51,7 +51,7 @@ router.post("/login", async (req, res) => {
     // Create token
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
 
-    res.json({ token, name: user.name });
+    res.json({ token, name: user.name, isAdmin: user.isAdmin }); // ← added isAdmin
 
   } catch (error) {
     res.status(500).json({ error: error.message });

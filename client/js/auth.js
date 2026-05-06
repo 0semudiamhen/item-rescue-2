@@ -74,6 +74,7 @@ if (loginForm) {
       if (res.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("name", data.name);
+        localStorage.setItem("isAdmin", data.isAdmin); // ← added isAdmin
         alert(`Welcome back, ${data.name}!`);
         window.location.href = "index.html";
       } else {

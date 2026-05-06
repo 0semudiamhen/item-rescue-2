@@ -24,8 +24,8 @@ fetch("http://localhost:8000/api/items")
 
       // Contact info
       let contactInfo = "";
-      if (item.contactType === "school_email" ) {
-        contactInfo = `School Email on file`;
+      if (item.contactType === "school_email") {
+        contactInfo = "School Email on file";
       } else if (item.contactType === "personal_email") {
         contactInfo = item.contactValue;
       } else if (item.contactType === "phone") {
@@ -56,35 +56,35 @@ const form = document.getElementById("itemForm");
 
 if (form) {
 
-    // Show/hide student services checkbox based on item type
-    const typeSelect = document.getElementById("type");
-    const studentServicesDiv = document.getElementById("studentServicesDiv");
+  // Show/hide student services checkbox based on item type
+  const typeSelect = document.getElementById("type");
+  const studentServicesDiv = document.getElementById("studentServicesDiv");
 
-    if (typeSelect) {
-      typeSelect.addEventListener("change", () => {
-        if (typeSelect.value === "found") {
-          studentServicesDiv.style.display = "block";
-        } else {
-          studentServicesDiv.style.display = "none";
-        }
-      });
-    }
+  if (typeSelect) {
+    typeSelect.addEventListener("change", () => {
+      if (typeSelect.value === "found") {
+        studentServicesDiv.style.display = "block";
+      } else {
+        studentServicesDiv.style.display = "none";
+      }
+    });
+  }
 
-    // Show/hide contact input based on contact type
-    const contactType = document.getElementById("contactType");
-    const contactInputDiv = document.getElementById("contactInputDiv");
+  // Show/hide contact input based on contact type
+  const contactType = document.getElementById("contactType");
+  const contactInputDiv = document.getElementById("contactInputDiv");
 
-    if (contactType) {
-      contactType.addEventListener("change", () => {
-        if (contactType.value === "phone") {
-          contactInputDiv.innerHTML = `<input type="tel" id="contactValue" placeholder="Enter your phone number">`;
-        } else if (contactType.value === "personal_email") {
-          contactInputDiv.innerHTML = `<input type="email" id="contactValue" placeholder="Enter your personal email">`;
-        } else {
-          contactInputDiv.innerHTML = "";
-        }
-      });
-    }
+  if (contactType) {
+    contactType.addEventListener("change", () => {
+      if (contactType.value === "phone") {
+        contactInputDiv.innerHTML = `<input type="tel" id="contactValue" placeholder="Enter your phone number">`;
+      } else if (contactType.value === "personal_email") {
+        contactInputDiv.innerHTML = `<input type="email" id="contactValue" placeholder="Enter your personal email">`;
+      } else {
+        contactInputDiv.innerHTML = "";
+      }
+    });
+  }
 
   console.log("Form found");
   form.addEventListener("submit", async (e) => {
@@ -92,25 +92,26 @@ if (form) {
     console.log("Form submitted");
 
     const item = {
-  title: document.getElementById("title").value,
-  description: document.getElementById("description").value,
-  category: document.getElementById("category").value,
-  location: document.getElementById("location").value,
-  type: document.getElementById("type").value,
-  takenToStudentServices: document.getElementById("takenToStudentServices") 
-    ? document.getElementById("takenToStudentServices").checked 
-    : false,
-  contactType: document.getElementById("contactType").value,
-  contactValue: document.getElementById("contactValue") 
-    ? document.getElementById("contactValue").value 
-    : document.getElementById("email") ? localStorage.getItem("name") : ""
-};
+      title: document.getElementById("title").value,
+      description: document.getElementById("description").value,
+      category: document.getElementById("category").value,
+      location: document.getElementById("location").value,
+      type: document.getElementById("type").value,
+      takenToStudentServices: document.getElementById("takenToStudentServices")
+        ? document.getElementById("takenToStudentServices").checked
+        : false,
+      contactType: document.getElementById("contactType").value,
+      contactValue: document.getElementById("contactValue")
+        ? document.getElementById("contactValue").value
+        : ""
+    };
 
     try {
       const res = await fetch("http://localhost:8000/api/items", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": token  // ← sending token with request
         },
         body: JSON.stringify(item)
       });

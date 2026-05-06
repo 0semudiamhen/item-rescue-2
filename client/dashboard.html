@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Dashboard - CU Item Rescue</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" alt="Central University Logo">
+      Item Rescue
+    </a>
+    <div class="nav-right">
+      <span id="welcomeMsg"></span>
+      <a href="index.html">All Items</a>
+      <a href="post-item.html">Post an Item</a>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1>My Dashboard</h1>
+    <p>Manage your posted items</p>
+  </div>
+
+  <div class="container">
+    <p class="section-title">My Items</p>
+    <p class="section-subtitle">Items you have posted on CU Item Rescue</p>
+    <div id="myItemsList" class="items-grid"></div>
+  </div>
+
+  <script src="js/dashboard.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

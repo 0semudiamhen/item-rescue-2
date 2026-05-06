@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>CU Item Rescue</title>
+  <title>Admin Panel - CU Item Rescue</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -13,24 +13,30 @@
     </a>
     <div class="nav-right">
       <span id="welcomeMsg"></span>
+      <a href="index.html">All Items</a>
       <a href="dashboard.html">My Dashboard</a>
-      <a href="post-item.html">Post an Item</a>
       <button id="logoutBtn">Logout</button>
     </div>
   </nav>
 
   <div class="hero">
-    <h1>Lost Something? Found Something?</h1>
-    <p>Central University's Official Lost and Found Platform</p>
+    <h1>Admin Panel</h1>
+    <p>Manage all items and users on CU Item Rescue</p>
   </div>
 
   <div class="container">
     <p class="section-title">All Items</p>
-    <p class="section-subtitle">Browse recently lost and found items on campus</p>
-    <div id="itemsList" class="items-grid"></div>
+    <p class="section-subtitle">Manage all posted items</p>
+    <div id="adminItemsList" class="items-grid"></div>
+
+    <br><br>
+
+    <p class="section-title">All Users</p>
+    <p class="section-subtitle">Manage all registered users</p>
+    <div id="adminUsersList" class="items-grid"></div>
   </div>
 
-  <script src="js/items.js"></script>
+  <script src="js/admin.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
