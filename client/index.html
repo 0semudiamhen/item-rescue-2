@@ -27,6 +27,17 @@
   <div class="container">
     <p class="section-title">All Items</p>
     <p class="section-subtitle">Browse recently lost and found items on campus</p>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by title or category...">
+    </div>
+
+    <div class="toggle-bar">
+      <button class="toggle-btn active" data-filter="all">All Items</button>
+      <button class="toggle-btn lost-btn" data-filter="lost">Lost</button>
+      <button class="toggle-btn found-btn" data-filter="found">Found</button>
+    </div>
+
     <div id="itemsList" class="items-grid"></div>
   </div>
 

@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const Item = require("./models/Item");
+const User = require("./models/User");
 const authRoutes = require("./routes/auth");
 const authMiddleware = require("./middleware/auth");
 const adminRoutes = require("./routes/admin");
@@ -33,10 +34,16 @@ app.post("/api/items", authMiddleware, async (req, res) => {
   }
 });
 
-// Get all items
+// Get all active items only
 app.get("/api/items", async (req, res) => {
-  const items = await Item.find();
-  res.json(items);
+  try {
+    const items = await Item.find({
+      $or: [{ status: "active" }, { status: { $exists: false } }]
+    });
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Get items posted by logged in user
@@ -49,7 +56,30 @@ app.get("/api/items/mine", authMiddleware, async (req, res) => {
   }
 });
 
-// Delete item
+// Mark item as resolved (owner or admin)
+app.patch("/api/items/:id/resolve", authMiddleware, async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id);
+    if (!item) return res.status(404).json({ error: "Item not found" });
+
+    // Check if user is owner or admin
+    const user = await User.findById(req.user.userId);
+    const isOwner = item.postedBy && item.postedBy.toString() === req.user.userId;
+    const isAdmin = user && user.isAdmin;
+
+    if (!isOwner && !isAdmin) {
+      return res.status(401).json({ error: "Not authorized" });
+    }
+
+    item.status = "resolved";
+    await item.save();
+    res.json({ message: "Item marked as resolved" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete item (owner only)
 app.delete("/api/items/:id", authMiddleware, async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);

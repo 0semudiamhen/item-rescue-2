@@ -7,6 +7,11 @@ const itemSchema = new mongoose.Schema({
   location: String,
   type: String, // lost or found
   image: String,
+  status: {
+    type: String,
+    enum: ["active", "resolved"],
+    default: "active"
+  },
   takenToStudentServices: {
     type: Boolean,
     default: false
@@ -21,7 +26,6 @@ const itemSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-  
 });
 
 module.exports = mongoose.model("Item", itemSchema);

@@ -6,47 +6,98 @@ if (!token) {
 
 console.log("JS is connected");
 
-// Display items
+// Store all items globally so we can filter without refetching
+let allItems = [];
+let currentFilter = "all";
+
+// Render items to the page
+function renderItems(items) {
+  const container = document.getElementById("itemsList");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (items.length === 0) {
+    container.innerHTML = "<p>No items found.</p>";
+    return;
+  }
+
+  items.forEach(item => {
+    const div = document.createElement("div");
+    div.classList.add("item-card");
+
+    // Contact info
+    let contactInfo = "";
+    if (item.contactType === "school_email") {
+      contactInfo = "School Email on file";
+    } else if (item.contactType === "personal_email") {
+      contactInfo = item.contactValue;
+    } else if (item.contactType === "phone") {
+      contactInfo = item.contactValue;
+    }
+
+    // Student services banner
+    const studentServicesBanner = item.takenToStudentServices
+      ? `<p class="student-services-badge">📦 Handed to Student Services — Cafeteria Building, adjacent to International Student Office</p>`
+      : "";
+
+    div.innerHTML = `
+      <h3>${item.title}</h3>
+      <span class="badge ${item.type}">${item.type}</span>
+      ${studentServicesBanner}
+      <p><span>Category:</span> ${item.category || "N/A"}</p>
+      <p><span>Location:</span> ${item.location || "N/A"}</p>
+      <p><span>Description:</span> ${item.description}</p>
+      <p><span>Contact:</span> ${contactInfo || "N/A"}</p>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Apply search and toggle filters
+function applyFilters() {
+  const searchInput = document.getElementById("searchInput");
+  const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
+
+  const filtered = allItems.filter(item => {
+    const matchesSearch =
+      item.title.toLowerCase().includes(searchTerm) ||
+      (item.category && item.category.toLowerCase().includes(searchTerm));
+
+    const matchesType =
+      currentFilter === "all" || item.type === currentFilter;
+
+    return matchesSearch && matchesType;
+  });
+
+  renderItems(filtered);
+}
+
+// Fetch all items
 fetch("http://localhost:8000/api/items")
   .then(res => res.json())
   .then(data => {
-    const container = document.getElementById("itemsList");
-    if (!container) return;
+    allItems = data;
+    renderItems(allItems);
 
-    if (data.length === 0) {
-      container.innerHTML = "<p>No items posted yet.</p>";
-      return;
+    // Search input
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+      searchInput.addEventListener("input", applyFilters);
     }
 
-    data.forEach(item => {
-      const div = document.createElement("div");
-      div.classList.add("item-card");
-
-      // Contact info
-      let contactInfo = "";
-      if (item.contactType === "school_email") {
-        contactInfo = "School Email on file";
-      } else if (item.contactType === "personal_email") {
-        contactInfo = item.contactValue;
-      } else if (item.contactType === "phone") {
-        contactInfo = item.contactValue;
-      }
-
-      // Student services banner
-      const studentServicesBanner = item.takenToStudentServices
-        ? `<p class="student-services-badge">📦 Handed to Student Services — Cafeteria Building, adjacent to International Student Office</p>`
-        : "";
-
-      div.innerHTML = `
-        <h3>${item.title}</h3>
-        <span class="badge ${item.type}">${item.type}</span>
-        ${studentServicesBanner}
-        <p><span>Category:</span> ${item.category || "N/A"}</p>
-        <p><span>Location:</span> ${item.location || "N/A"}</p>
-        <p><span>Description:</span> ${item.description}</p>
-        <p><span>Contact:</span> ${contactInfo || "N/A"}</p>
-      `;
-      container.appendChild(div);
+    // Toggle buttons
+    const toggleBtns = document.querySelectorAll(".toggle-btn");
+    toggleBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        // Remove active from all buttons
+        toggleBtns.forEach(b => b.classList.remove("active"));
+        // Add active to clicked button
+        btn.classList.add("active");
+        // Update current filter
+        currentFilter = btn.dataset.filter;
+        applyFilters();
+      });
     });
   })
   .catch(err => console.error(err));
@@ -111,7 +162,7 @@ if (form) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": token  // ← sending token with request
+          "Authorization": token
         },
         body: JSON.stringify(item)
       });
