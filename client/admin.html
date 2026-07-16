@@ -14,6 +14,7 @@
     <div class="nav-right">
       <span id="welcomeMsg"></span>
       <a href="index.html">All Items</a>
+      <a href="profile.html">My Profile</a>
       <a href="dashboard.html">My Dashboard</a>
       <button id="logoutBtn">Logout</button>
     </div>
@@ -25,18 +26,22 @@
   </div>
 
   <div class="container">
-    <p class="section-title">All Items</p>
-    <p class="section-subtitle">Manage all posted items</p>
-    <div id="adminItemsList" class="items-grid"></div>
+    <p class="section-title">Admin Tools</p>
+    <p class="section-subtitle">Choose what you want to manage</p>
 
-    <br><br>
+    <div class="admin-menu-grid">
+      <a href="admin-items.html" class="admin-menu-card">
+        <span>Items</span>
+        <strong>Manage posted lost and found items</strong>
+      </a>
 
-    <p class="section-title">All Users</p>
-    <p class="section-subtitle">Manage all registered users</p>
-    <div id="adminUsersList" class="items-grid"></div>
+      <a href="admin-users.html" class="admin-menu-card">
+        <span>Users</span>
+        <strong>View registered users and account details</strong>
+      </a>
+    </div>
   </div>
 
-  <script src="js/admin.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

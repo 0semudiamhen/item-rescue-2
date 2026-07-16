@@ -24,6 +24,15 @@ body {
   background-color: var(--off-white);
   color: var(--dark);
   min-height: 100vh;
+  transition: background-color 0.35s ease;
+}
+
+body[data-filter-mood="lost"] {
+  background-color: #fff6f6;
+}
+
+body[data-filter-mood="found"] {
+  background-color: #f4fff8;
 }
 
 /* NAVBAR */
@@ -96,6 +105,15 @@ nav .nav-right button:hover {
   color: var(--white);
   padding: 60px 32px;
   text-align: center;
+  transition: background 0.35s ease;
+}
+
+body[data-filter-mood="lost"] .hero {
+  background: linear-gradient(135deg, #d60000 0%, #7f0000 100%);
+}
+
+body[data-filter-mood="found"] .hero {
+  background: linear-gradient(135deg, var(--red) 0%, #007a2a 100%);
 }
 
 .hero h1 {
@@ -108,6 +126,10 @@ nav .nav-right button:hover {
 .hero p {
   font-size: 18px;
   opacity: 0.9;
+}
+
+.hero .item-filter-switch {
+  margin: 26px auto 0;
 }
 
 /* CONTAINER */
@@ -132,6 +154,14 @@ nav .nav-right button:hover {
   box-shadow: var(--shadow);
   border-top: 4px solid var(--red);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body[data-filter-mood="found"] .item-card {
+  border-top-color: #00882b;
+}
+
+body[data-filter-mood="lost"] .item-card {
+  border-top-color: var(--red);
 }
 
 .item-card:hover {
@@ -274,6 +304,135 @@ nav .nav-right button:hover {
   font-size: 15px;
 }
 
+.admin-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.admin-menu-card {
+  display: block;
+  min-height: 150px;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: var(--white);
+  border-top: 4px solid var(--red);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-menu-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(204, 0, 0, 0.2);
+}
+
+.admin-menu-card span {
+  display: block;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 34px;
+  letter-spacing: 2px;
+  color: var(--red);
+  margin-bottom: 10px;
+}
+
+.admin-menu-card strong {
+  display: block;
+  color: var(--dark);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.profile-layout {
+  display: grid;
+  gap: 24px;
+}
+
+.profile-card,
+.profile-details {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--red);
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: var(--red);
+  color: var(--white);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 2px;
+  box-shadow: 0 10px 22px rgba(204, 0, 0, 0.24);
+}
+
+.profile-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.profile-detail-grid div {
+  padding: 16px;
+  border: 1px solid var(--light-gray);
+  border-radius: 8px;
+  background: var(--off-white);
+}
+
+.profile-detail-grid span {
+  display: block;
+  color: var(--gray);
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.profile-detail-grid strong {
+  color: var(--dark);
+  font-size: 16px;
+}
+
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.profile-action-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 50px;
+  background: var(--red);
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 800;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.profile-action-btn.secondary {
+  background: var(--dark);
+}
+
+.profile-action-btn:hover {
+  transform: translateY(-1px);
+  background: var(--dark-red);
+}
+
 nav .logo {
   display: flex;
   align-items: center;
@@ -366,46 +525,88 @@ nav .logo img {
   background-color: #006620;
 }
 
-.toggle-bar {
-  display: flex;
-  gap: 12px;
+.item-filter-switch {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(100%, 460px);
+  min-height: 54px;
+  padding: 5px;
   margin-bottom: 24px;
+  border: 1px solid #dedede;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(26, 26, 26, 0.18);
+  overflow: hidden;
+}
+
+.filter-slider {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: calc((100% - 10px) / 3);
+  height: calc(100% - 10px);
+  border-radius: 999px;
+  background: var(--dark);
+  box-shadow: 0 8px 18px rgba(26, 26, 26, 0.18);
+  transition: transform 0.28s ease, background-color 0.28s ease;
+  pointer-events: none;
+}
+
+.item-filter-switch[data-active="lost"] .filter-slider {
+  transform: translateX(100%);
+  background: var(--red);
+}
+
+.item-filter-switch[data-active="found"] .filter-slider {
+  transform: translateX(200%);
+  background: #00882b;
 }
 
 .toggle-btn {
-  padding: 10px 24px;
-  border: 2px solid var(--light-gray);
-  border-radius: 50px;
-  background: var(--white);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
   font-family: 'Nunito', sans-serif;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
   color: var(--gray);
-}
-
-.toggle-btn.active {
-  background-color: var(--dark);
-  color: var(--white);
-  border-color: var(--dark);
-}
-
-.toggle-btn.lost-btn.active {
-  background-color: var(--red);
-  color: var(--white);
-  border-color: var(--red);
-}
-
-.toggle-btn.found-btn.active {
-  background-color: #00882b;
-  color: var(--white);
-  border-color: #00882b;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .toggle-btn:hover {
-  border-color: var(--dark);
   color: var(--dark);
+  transform: translateY(-1px);
+}
+
+.toggle-btn.active {
+  color: var(--white);
+}
+
+.toggle-btn strong {
+  min-width: 24px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--light-gray);
+  color: var(--dark);
+  font-size: 12px;
+  line-height: 1.4;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.toggle-btn.active strong {
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--white);
 }
 
 .item-card .btn-group {

@@ -16,7 +16,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Show admin link if user is admin and not already on admin page
   const isAdmin = localStorage.getItem("isAdmin");
-  const onAdminPage = window.location.pathname.includes("admin.html");
+  const onAdminPage = window.location.pathname.includes("admin");
+
+  if (onAdminPage && isAdmin !== "true") {
+    window.location.href = "index.html";
+    return;
+  }
 
   if (isAdmin === "true" && !onAdminPage) {
     const navRight = document.querySelector(".nav-right");

@@ -13,6 +13,7 @@
     </a>
     <div class="nav-right">
       <span id="welcomeMsg"></span>
+      <a href="profile.html">My Profile</a>
       <a href="dashboard.html">My Dashboard</a>
       <a href="post-item.html">Post an Item</a>
       <button id="logoutBtn">Logout</button>
@@ -22,6 +23,22 @@
   <div class="hero">
     <h1>Lost Something? Found Something?</h1>
     <p>Central University's Official Lost and Found Platform</p>
+
+    <div class="item-filter-switch" id="itemFilterSwitch" data-active="all" aria-label="Filter items">
+      <span class="filter-slider"></span>
+      <button class="toggle-btn active" type="button" data-filter="all" aria-pressed="true">
+        <span>All</span>
+        <strong id="allCount">0</strong>
+      </button>
+      <button class="toggle-btn" type="button" data-filter="lost" aria-pressed="false">
+        <span>Lost</span>
+        <strong id="lostCount">0</strong>
+      </button>
+      <button class="toggle-btn" type="button" data-filter="found" aria-pressed="false">
+        <span>Found</span>
+        <strong id="foundCount">0</strong>
+      </button>
+    </div>
   </div>
 
   <div class="container">
@@ -30,12 +47,6 @@
 
     <div class="search-bar">
       <input type="text" id="searchInput" placeholder="Search by title or category...">
-    </div>
-
-    <div class="toggle-bar">
-      <button class="toggle-btn active" data-filter="all">All Items</button>
-      <button class="toggle-btn lost-btn" data-filter="lost">Lost</button>
-      <button class="toggle-btn found-btn" data-filter="found">Found</button>
     </div>
 
     <div id="itemsList" class="items-grid"></div>

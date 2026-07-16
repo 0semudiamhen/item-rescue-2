@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Dashboard - CU Item Rescue</title>
+  <title>Admin Items - CU Item Rescue</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -13,25 +13,26 @@
     </a>
     <div class="nav-right">
       <span id="welcomeMsg"></span>
-      <a href="index.html">All Items</a>
+      <a href="admin.html">Admin Home</a>
+      <a href="admin-users.html">Users</a>
       <a href="profile.html">My Profile</a>
-      <a href="post-item.html">Post an Item</a>
+      <a href="index.html">All Items</a>
       <button id="logoutBtn">Logout</button>
     </div>
   </nav>
 
   <div class="hero">
-    <h1>My Dashboard</h1>
-    <p>Manage your posted items</p>
+    <h1>Admin Items</h1>
+    <p>Manage all lost and found posts</p>
   </div>
 
   <div class="container">
-    <p class="section-title">My Items</p>
-    <p class="section-subtitle">Items you have posted on CU Item Rescue</p>
-    <div id="myItemsList" class="items-grid"></div>
+    <p class="section-title">All Items</p>
+    <p class="section-subtitle">Resolve or delete posted items</p>
+    <div id="adminItemsList" class="items-grid"></div>
   </div>
 
-  <script src="js/dashboard.js"></script>
+  <script src="js/admin.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

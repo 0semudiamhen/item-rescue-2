@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Profile - CU Item Rescue</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" alt="Central University Logo">
+      Item Rescue
+    </a>
+    <div class="nav-right">
+      <span id="welcomeMsg"></span>
+      <a href="index.html">All Items</a>
+      <a href="dashboard.html">My Dashboard</a>
+      <a href="post-item.html">Post an Item</a>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1>My Profile</h1>
+    <p>Your CU Item Rescue account details</p>
+  </div>
+
+  <div class="container">
+    <div class="profile-layout">
+      <section class="profile-card">
+        <div class="profile-avatar" id="profileInitials">CU</div>
+        <div>
+          <p class="section-title" id="profileName">Loading...</p>
+          <p class="section-subtitle" id="profileEmail">Fetching your account details</p>
+        </div>
+      </section>
+
+      <section class="profile-details">
+        <p class="section-title">Account Information</p>
+        <div class="profile-detail-grid">
+          <div>
+            <span>Index Number</span>
+            <strong id="profileIndexNumber">N/A</strong>
+          </div>
+          <div>
+            <span>Login ID</span>
+            <strong id="profileLoginId">N/A</strong>
+          </div>
+          <div>
+            <span>Department</span>
+            <strong id="profileDepartment">N/A</strong>
+          </div>
+          <div>
+            <span>Level</span>
+            <strong id="profileLevel">N/A</strong>
+          </div>
+          <div>
+            <span>Role</span>
+            <strong id="profileRole">User</strong>
+          </div>
+          <div>
+            <span>Joined</span>
+            <strong id="profileJoined">N/A</strong>
+          </div>
+        </div>
+
+        <div class="profile-actions">
+          <a href="change-password.html" class="profile-action-btn">Change Password</a>
+          <a href="dashboard.html" class="profile-action-btn secondary">View My Items</a>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="js/profile.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

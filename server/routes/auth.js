@@ -4,14 +4,28 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const nodemailer = require("nodemailer");
+const authMiddleware = require("../middleware/auth");
 require("dotenv").config();
 
 const JWT_SECRET = "lostfound_secret_key";
 
+function normalizeIndexNumber(indexNumber) {
+  return String(indexNumber || "").replace(/[\/\s-]/g, "").toUpperCase();
+}
+
 // SIGNUP
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, indexNumber, department, level } = req.body;
+    const normalizedIndexNumber = normalizeIndexNumber(indexNumber);
+
+    if (!email || !email.endsWith("@central.edu.gh")) {
+      return res.status(400).json({ error: "You must use your Central University email address" });
+    }
+
+    if (!name || !password || !normalizedIndexNumber || !department || !level) {
+      return res.status(400).json({ error: "Please fill in all required fields" });
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -19,11 +33,29 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ error: "Email already registered" });
     }
 
+    const existingIndexNumber = await User.findOne({
+      $or: [
+        { indexNumber },
+        { indexNumberNormalized: normalizedIndexNumber }
+      ]
+    });
+    if (existingIndexNumber) {
+      return res.status(400).json({ error: "Index number already registered" });
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
-    const user = new User({ name, email, password: hashedPassword });
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      indexNumber,
+      indexNumberNormalized: normalizedIndexNumber,
+      department,
+      level
+    });
     await user.save();
 
     res.json({ message: "Account created successfully" });
@@ -37,9 +69,25 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+    const loginId = String(email || "").trim();
+    const normalizedLoginId = normalizeIndexNumber(loginId);
 
     // Find user
-    const user = await User.findOne({ email });
+    let user = await User.findOne({
+      $or: [
+        { email: loginId },
+        { indexNumber: loginId },
+        { indexNumberNormalized: normalizedLoginId }
+      ]
+    });
+
+    if (!user && normalizedLoginId) {
+      const usersWithIndexNumbers = await User.find({ indexNumber: { $exists: true, $ne: "" } });
+      user = usersWithIndexNumbers.find(existingUser => {
+        return normalizeIndexNumber(existingUser.indexNumber) === normalizedLoginId;
+      });
+    }
+
     if (!user) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
@@ -55,6 +103,20 @@ router.post("/login", async (req, res) => {
 
     res.json({ token, name: user.name, isAdmin: user.isAdmin }); // ← added isAdmin
 
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// CURRENT USER PROFILE
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

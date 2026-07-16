@@ -25,6 +25,9 @@ if (signupForm) {
     const user = {
       name: document.getElementById("name").value,
       email: document.getElementById("email").value,
+      indexNumber: document.getElementById("indexNumber").value,
+      department: document.getElementById("department").value,
+      level: document.getElementById("level").value,
       password: document.getElementById("password").value
     };
 
@@ -58,7 +61,7 @@ if (loginForm) {
     e.preventDefault();
 
     const credentials = {
-      email: document.getElementById("email").value,
+      email: document.getElementById("email").value.trim(),
       password: document.getElementById("password").value
     };
 

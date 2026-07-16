@@ -9,6 +9,17 @@ console.log("JS is connected");
 // Store all items globally so we can filter without refetching
 let allItems = [];
 let currentFilter = "all";
+document.body.dataset.filterMood = currentFilter;
+
+function updateFilterCounts() {
+  const allCount = document.getElementById("allCount");
+  const lostCount = document.getElementById("lostCount");
+  const foundCount = document.getElementById("foundCount");
+
+  if (allCount) allCount.textContent = allItems.length;
+  if (lostCount) lostCount.textContent = allItems.filter(item => item.type === "lost").length;
+  if (foundCount) foundCount.textContent = allItems.filter(item => item.type === "found").length;
+}
 
 // Render items to the page
 function renderItems(items) {
@@ -78,6 +89,7 @@ fetch("http://localhost:8000/api/items")
   .then(res => res.json())
   .then(data => {
     allItems = data;
+    updateFilterCounts();
     renderItems(allItems);
 
     // Search input
@@ -86,16 +98,25 @@ fetch("http://localhost:8000/api/items")
       searchInput.addEventListener("input", applyFilters);
     }
 
-    // Toggle buttons
+    // Filter switch
+    const filterSwitch = document.getElementById("itemFilterSwitch");
     const toggleBtns = document.querySelectorAll(".toggle-btn");
     toggleBtns.forEach(btn => {
       btn.addEventListener("click", () => {
         // Remove active from all buttons
-        toggleBtns.forEach(b => b.classList.remove("active"));
+        toggleBtns.forEach(b => {
+          b.classList.remove("active");
+          b.setAttribute("aria-pressed", "false");
+        });
         // Add active to clicked button
         btn.classList.add("active");
+        btn.setAttribute("aria-pressed", "true");
         // Update current filter
         currentFilter = btn.dataset.filter;
+        if (filterSwitch) {
+          filterSwitch.dataset.active = currentFilter;
+        }
+        document.body.dataset.filterMood = currentFilter;
         applyFilters();
       });
     });
@@ -106,6 +127,24 @@ fetch("http://localhost:8000/api/items")
 const form = document.getElementById("itemForm");
 
 if (form) {
+
+  // Show/hide custom category input
+  const categorySelect = document.getElementById("category");
+  const otherCategoryDiv = document.getElementById("otherCategoryDiv");
+  const otherCategoryInput = document.getElementById("otherCategory");
+
+  if (categorySelect && otherCategoryDiv && otherCategoryInput) {
+    categorySelect.addEventListener("change", () => {
+      if (categorySelect.value === "Other") {
+        otherCategoryDiv.style.display = "block";
+        otherCategoryInput.required = true;
+      } else {
+        otherCategoryDiv.style.display = "none";
+        otherCategoryInput.required = false;
+        otherCategoryInput.value = "";
+      }
+    });
+  }
 
   // Show/hide student services checkbox based on item type
   const typeSelect = document.getElementById("type");
@@ -142,10 +181,20 @@ if (form) {
     e.preventDefault();
     console.log("Form submitted");
 
+    const selectedCategory = document.getElementById("category").value;
+    const customCategory = document.getElementById("otherCategory")
+      ? document.getElementById("otherCategory").value.trim()
+      : "";
+
+    if (selectedCategory === "Other" && !customCategory) {
+      alert("Please enter the item category.");
+      return;
+    }
+
     const item = {
       title: document.getElementById("title").value,
       description: document.getElementById("description").value,
-      category: document.getElementById("category").value,
+      category: selectedCategory === "Other" ? customCategory : selectedCategory,
       location: document.getElementById("location").value,
       type: document.getElementById("type").value,
       takenToStudentServices: document.getElementById("takenToStudentServices")
