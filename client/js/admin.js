@@ -18,7 +18,7 @@ if (adminItemsContainer) {
       const container = adminItemsContainer;
 
       if (data.length === 0) {
-        container.innerHTML = "<p>No items posted yet.</p>";
+        container.innerHTML = `<p class="empty-state">No items posted yet.</p>`;
         return;
       }
 
@@ -72,7 +72,7 @@ if (adminUsersContainer) {
       const container = adminUsersContainer;
 
       if (data.length === 0) {
-        container.innerHTML = "<p>No users registered yet.</p>";
+        container.innerHTML = `<p class="empty-state">No users registered yet.</p>`;
         return;
       }
 
@@ -113,14 +113,17 @@ async function resolveItem(id) {
     const data = await res.json();
 
     if (res.ok) {
-      alert("Item marked as resolved!");
-      window.location.reload();
+      notify("Item marked as resolved.", "success");
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
     } else {
-      alert(data.error);
+      notify(data.error, "error");
     }
 
   } catch (err) {
     console.error(err);
+    notify("Unable to resolve item right now.", "error");
   }
 }
 
@@ -139,14 +142,17 @@ async function deleteItem(id) {
     const data = await res.json();
 
     if (res.ok) {
-      alert("Item deleted successfully!");
-      window.location.reload();
+      notify("Item deleted successfully.", "success");
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
     } else {
-      alert(data.error);
+      notify(data.error, "error");
     }
 
   } catch (err) {
     console.error(err);
+    notify("Unable to delete item right now.", "error");
   }
 }
 
@@ -165,13 +171,16 @@ async function deleteUser(id) {
     const data = await res.json();
 
     if (res.ok) {
-      alert("User deleted successfully!");
-      window.location.reload();
+      notify("User deleted successfully.", "success");
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
     } else {
-      alert(data.error);
+      notify(data.error, "error");
     }
 
   } catch (err) {
     console.error(err);
+    notify("Unable to delete user right now.", "error");
   }
 }

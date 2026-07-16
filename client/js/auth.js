@@ -11,14 +11,14 @@ if (signupForm) {
     const confirmPassword = document.getElementById("confirmPassword").value;
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      notify("Passwords do not match.", "error");
       return;
     }
 
     const email = document.getElementById("email").value;
 
     if (!email.endsWith("@central.edu.gh")) {
-      alert("You must use your Central University email address (@central.edu.gh) to sign up.");
+      notify("Use your Central University email address.", "error");
       return;
     }
 
@@ -41,14 +41,17 @@ if (signupForm) {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Account created! Please login.");
-        window.location.href = "login.html";
+        notify("Account created. Please login.", "success");
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 700);
       } else {
-        alert(data.error);
+        notify(data.error, "error");
       }
 
     } catch (err) {
       console.error(err);
+      notify("Unable to create account right now.", "error");
     }
   });
 }
@@ -78,14 +81,17 @@ if (loginForm) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("name", data.name);
         localStorage.setItem("isAdmin", data.isAdmin); // ← added isAdmin
-        alert(`Welcome back, ${data.name}!`);
-        window.location.href = "index.html";
+        notify(`Welcome back, ${data.name}.`, "success");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 500);
       } else {
-        alert(data.error);
+        notify(data.error, "error");
       }
 
     } catch (err) {
       console.error(err);
+      notify("Unable to login right now.", "error");
     }
   });
 }

@@ -17,14 +17,17 @@ if (forgotForm) {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Temporary password sent! Check your email.");
-        window.location.href = "change-password.html";
+        notify("Temporary password sent. Check your email.", "success");
+        setTimeout(() => {
+          window.location.href = "change-password.html";
+        }, 700);
       } else {
-        alert(data.error);
+        notify(data.error, "error");
       }
 
     } catch (err) {
       console.error(err);
+      notify("Unable to send reset email right now.", "error");
     }
   });
 }
@@ -40,7 +43,7 @@ if (changeForm) {
     const confirmNewPassword = document.getElementById("confirmNewPassword").value;
 
     if (newPassword !== confirmNewPassword) {
-      alert("New passwords do not match!");
+      notify("New passwords do not match.", "error");
       return;
     }
 
@@ -60,14 +63,17 @@ if (changeForm) {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Password changed successfully! Please login.");
-        window.location.href = "login.html";
+        notify("Password changed. Please login.", "success");
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 700);
       } else {
-        alert(data.error);
+        notify(data.error, "error");
       }
 
     } catch (err) {
       console.error(err);
+      notify("Unable to change password right now.", "error");
     }
   });
 }

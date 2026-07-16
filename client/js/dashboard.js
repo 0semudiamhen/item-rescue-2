@@ -15,7 +15,7 @@ fetch("http://localhost:8000/api/items/mine", {
     if (!container) return;
 
     if (data.length === 0) {
-      container.innerHTML = "<p>You have not posted any items yet.</p>";
+      container.innerHTML = `<p class="empty-state">You have not posted any items yet.</p>`;
       return;
     }
 
@@ -83,14 +83,17 @@ async function resolveItem(id) {
     const data = await res.json();
 
     if (res.ok) {
-      alert("Item marked as resolved!");
-      window.location.reload();
+      notify("Item marked as resolved.", "success");
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
     } else {
-      alert(data.error);
+      notify(data.error, "error");
     }
 
   } catch (err) {
     console.error(err);
+    notify("Unable to resolve item right now.", "error");
   }
 }
 
@@ -109,13 +112,16 @@ async function deleteItem(id) {
     const data = await res.json();
 
     if (res.ok) {
-      alert("Item deleted successfully!");
-      window.location.reload();
+      notify("Item deleted successfully.", "success");
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
     } else {
-      alert(data.error);
+      notify(data.error, "error");
     }
 
   } catch (err) {
     console.error(err);
+    notify("Unable to delete item right now.", "error");
   }
 }

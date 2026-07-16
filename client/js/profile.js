@@ -20,8 +20,10 @@ fetch("http://localhost:8000/api/auth/me", {
   .then(res => res.json())
   .then(user => {
     if (user.error) {
-      alert(user.error);
-      window.location.href = "login.html";
+      notify(user.error, "error");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 700);
       return;
     }
 
@@ -39,5 +41,5 @@ fetch("http://localhost:8000/api/auth/me", {
   })
   .catch(err => {
     console.error(err);
-    alert("Unable to load profile right now.");
+    notify("Unable to load profile right now.", "error");
   });

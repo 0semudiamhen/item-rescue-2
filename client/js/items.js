@@ -29,7 +29,7 @@ function renderItems(items) {
   container.innerHTML = "";
 
   if (items.length === 0) {
-    container.innerHTML = "<p>No items found.</p>";
+    container.innerHTML = `<p class="empty-state">No items found.</p>`;
     return;
   }
 
@@ -187,7 +187,7 @@ if (form) {
       : "";
 
     if (selectedCategory === "Other" && !customCategory) {
-      alert("Please enter the item category.");
+      notify("Please enter the item category.", "error");
       return;
     }
 
@@ -219,12 +219,15 @@ if (form) {
       const data = await res.json();
       console.log("Item created:", data);
 
-      alert("Item posted successfully!");
+      notify("Item posted successfully.", "success");
       form.reset();
-      window.location.href = "index.html";
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 700);
 
     } catch (err) {
       console.error(err);
+      notify("Unable to post item right now.", "error");
     }
   });
 }
