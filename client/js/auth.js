@@ -1,5 +1,15 @@
 console.log("auth.js connected");
 
+// Helper — saves to localStorage if remember me is checked, sessionStorage if not
+function saveSession(data, remember) {
+  const storage = remember ? localStorage : sessionStorage;
+  storage.setItem("token", data.token);
+  storage.setItem("name", data.name);
+  storage.setItem("isAdmin", data.isAdmin);
+  storage.setItem("email", data.email);
+  storage.setItem("role", data.role || "student");
+}
+
 // SIGNUP
 const signupForm = document.getElementById("signupForm");
 
@@ -63,6 +73,8 @@ if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const rememberMe = document.getElementById("rememberMe").checked;
+
     const credentials = {
       email: document.getElementById("email").value.trim(),
       password: document.getElementById("password").value
@@ -78,11 +90,7 @@ if (loginForm) {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("name", data.name);
-        localStorage.setItem("isAdmin", data.isAdmin);
-        localStorage.setItem("email", data.email);       // ← save email
-        localStorage.setItem("role", data.role || "student"); // ← save role
+        saveSession(data, rememberMe);
         notify(`Welcome back, ${data.name}.`, "success");
         setTimeout(() => {
           window.location.href = "index.html";

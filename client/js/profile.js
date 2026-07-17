@@ -1,5 +1,5 @@
-const profileToken = localStorage.getItem("token");
-if (!profileToken) {
+const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+if (!token) {
   window.location.href = "login.html";
 }
 
@@ -14,7 +14,7 @@ function getInitials(name) {
 
 fetch("http://localhost:8000/api/auth/me", {
   headers: {
-    "Authorization": profileToken
+    "Authorization": token
   }
 })
   .then(res => res.json())
@@ -34,7 +34,7 @@ fetch("http://localhost:8000/api/auth/me", {
     document.getElementById("profileLoginId").textContent = user.indexNumberNormalized || "N/A";
     document.getElementById("profileDepartment").textContent = user.department || "N/A";
     document.getElementById("profileLevel").textContent = user.level || "N/A";
-    document.getElementById("profileRole").textContent = user.isAdmin ? "Admin" : "User";
+    document.getElementById("profileRole").textContent = user.isAdmin ? "Admin" : "Student";
     document.getElementById("profileJoined").textContent = user.createdAt
       ? new Date(user.createdAt).toLocaleDateString()
       : "N/A";

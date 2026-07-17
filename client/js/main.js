@@ -1,21 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  // Helper — read from whichever storage has the token
+  function getSession(key) {
+    return localStorage.getItem(key) || sessionStorage.getItem(key);
+  }
+
+  function clearSession() {
+    ["token", "name", "isAdmin", "email", "role"].forEach(key => {
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
+    });
+  }
+
   // Protect page
-  const token = localStorage.getItem("token");
+  const token = getSession("token");
   if (!token) {
     window.location.href = "login.html";
+    return;
   }
 
   // Show username
-  const name = localStorage.getItem("name");
+  const name = getSession("name");
   const welcomeMsg = document.getElementById("welcomeMsg");
 
   if (name && welcomeMsg) {
     welcomeMsg.textContent = `Welcome, ${name}`;
   }
 
-  // Show admin link if user is admin and not already on admin page
-  const isAdmin = localStorage.getItem("isAdmin");
+  // Admin page protection and link injection
+  const isAdmin = getSession("isAdmin");
   const onAdminPage = window.location.pathname.includes("admin");
 
   if (onAdminPage && isAdmin !== "true") {
@@ -38,9 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("name");
-      localStorage.removeItem("isAdmin");
+      clearSession();
       window.location.href = "login.html";
     });
   }
