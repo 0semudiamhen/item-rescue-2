@@ -17,17 +17,17 @@ if (forgotForm) {
       const data = await res.json();
 
       if (res.ok) {
-        notify("Temporary password sent. Check your email.", "success");
+        notify("Temporary password sent! Check your email.", "success");
         setTimeout(() => {
           window.location.href = "change-password.html";
-        }, 700);
+        }, 1000);
       } else {
         notify(data.error, "error");
       }
 
     } catch (err) {
       console.error(err);
-      notify("Unable to send reset email right now.", "error");
+      notify("Something went wrong. Please try again.", "error");
     }
   });
 }
@@ -36,6 +36,32 @@ if (forgotForm) {
 const changeForm = document.getElementById("changeForm");
 
 if (changeForm) {
+  const token = localStorage.getItem("token");
+  const subtitle = document.getElementById("formSubtitle");
+  const emailInput = document.getElementById("email");
+  const oldPasswordLabel = document.getElementById("oldPassword");
+
+  // If user is already logged in, auto-fill email and adjust wording
+  if (token) {
+    fetch("http://localhost:8000/api/auth/me", {
+      headers: { "Authorization": token }
+    })
+      .then(res => res.json())
+      .then(user => {
+        if (user.email) {
+          emailInput.value = user.email;
+          emailInput.readOnly = true;
+          emailInput.style.opacity = "0.6";
+        }
+        if (subtitle) subtitle.textContent = "Enter your current password and choose a new one";
+        if (oldPasswordLabel) oldPasswordLabel.placeholder = "Current password";
+      })
+      .catch(() => {});
+  } else {
+    if (subtitle) subtitle.textContent = "Enter your temporary password and choose a new one";
+    if (oldPasswordLabel) oldPasswordLabel.placeholder = "Temporary password";
+  }
+
   changeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -43,7 +69,7 @@ if (changeForm) {
     const confirmNewPassword = document.getElementById("confirmNewPassword").value;
 
     if (newPassword !== confirmNewPassword) {
-      notify("New passwords do not match.", "error");
+      notify("New passwords do not match!", "error");
       return;
     }
 
@@ -63,17 +89,17 @@ if (changeForm) {
       const data = await res.json();
 
       if (res.ok) {
-        notify("Password changed. Please login.", "success");
+        notify("Password changed successfully!", "success");
         setTimeout(() => {
           window.location.href = "login.html";
-        }, 700);
+        }, 1000);
       } else {
         notify(data.error, "error");
       }
 
     } catch (err) {
       console.error(err);
-      notify("Unable to change password right now.", "error");
+      notify("Something went wrong. Please try again.", "error");
     }
   });
 }

@@ -18,6 +18,7 @@ const itemSchema = new mongoose.Schema({
   },
   contactType: String, // school_email, personal_email, phone
   contactValue: String,
+  contactEmail: String, // stores actual email when contactType is school_email
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"

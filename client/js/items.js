@@ -11,6 +11,18 @@ let allItems = [];
 let currentFilter = "all";
 document.body.dataset.filterMood = currentFilter;
 
+// Hero text per filter
+const heroTitles = {
+  all: "Lost Something? Found Something?",
+  lost: "Found Something?",
+  found: "Lost Something?"
+};
+
+function updateHeroText(filter) {
+  const heroH1 = document.querySelector(".hero h1");
+  if (heroH1) heroH1.textContent = heroTitles[filter] || heroTitles.all;
+}
+
 function updateFilterCounts() {
   const allCount = document.getElementById("allCount");
   const lostCount = document.getElementById("lostCount");
@@ -37,14 +49,20 @@ function renderItems(items) {
     const div = document.createElement("div");
     div.classList.add("item-card");
 
-    // Contact info
+    // Contact info — show actual email if school email selected
     let contactInfo = "";
+    let contactAction = "";
     if (item.contactType === "school_email") {
-      contactInfo = "School Email on file";
+      contactInfo = item.contactEmail || "School Email on file";
+      if (item.contactEmail) {
+        contactAction = `<a href="mailto:${item.contactEmail}" class="contact-btn">✉ Send Email</a>`;
+      }
     } else if (item.contactType === "personal_email") {
       contactInfo = item.contactValue;
+      contactAction = `<a href="mailto:${item.contactValue}" class="contact-btn">✉ Send Email</a>`;
     } else if (item.contactType === "phone") {
       contactInfo = item.contactValue;
+      contactAction = `<a href="tel:${item.contactValue}" class="contact-btn">📞 Call</a>`;
     }
 
     // Student services banner
@@ -60,6 +78,7 @@ function renderItems(items) {
       <p><span>Location:</span> ${item.location || "N/A"}</p>
       <p><span>Description:</span> ${item.description}</p>
       <p><span>Contact:</span> ${contactInfo || "N/A"}</p>
+      ${contactAction}
     `;
     container.appendChild(div);
   });
@@ -103,20 +122,18 @@ fetch("http://localhost:8000/api/items")
     const toggleBtns = document.querySelectorAll(".toggle-btn");
     toggleBtns.forEach(btn => {
       btn.addEventListener("click", () => {
-        // Remove active from all buttons
         toggleBtns.forEach(b => {
           b.classList.remove("active");
           b.setAttribute("aria-pressed", "false");
         });
-        // Add active to clicked button
         btn.classList.add("active");
         btn.setAttribute("aria-pressed", "true");
-        // Update current filter
         currentFilter = btn.dataset.filter;
         if (filterSwitch) {
           filterSwitch.dataset.active = currentFilter;
         }
         document.body.dataset.filterMood = currentFilter;
+        updateHeroText(currentFilter);
         applyFilters();
       });
     });
@@ -128,7 +145,6 @@ const form = document.getElementById("itemForm");
 
 if (form) {
 
-  // Show/hide custom category input
   const categorySelect = document.getElementById("category");
   const otherCategoryDiv = document.getElementById("otherCategoryDiv");
   const otherCategoryInput = document.getElementById("otherCategory");
@@ -146,7 +162,6 @@ if (form) {
     });
   }
 
-  // Show/hide student services checkbox based on item type
   const typeSelect = document.getElementById("type");
   const studentServicesDiv = document.getElementById("studentServicesDiv");
 
@@ -160,7 +175,6 @@ if (form) {
     });
   }
 
-  // Show/hide contact input based on contact type
   const contactType = document.getElementById("contactType");
   const contactInputDiv = document.getElementById("contactInputDiv");
 

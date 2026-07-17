@@ -80,7 +80,9 @@ if (loginForm) {
       if (res.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("name", data.name);
-        localStorage.setItem("isAdmin", data.isAdmin); // ← added isAdmin
+        localStorage.setItem("isAdmin", data.isAdmin);
+        localStorage.setItem("email", data.email);       // ← save email
+        localStorage.setItem("role", data.role || "student"); // ← save role
         notify(`Welcome back, ${data.name}.`, "success");
         setTimeout(() => {
           window.location.href = "index.html";

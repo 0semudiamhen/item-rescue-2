@@ -23,9 +23,13 @@ app.get("/", (req, res) => {
 // Create item (protected)
 app.post("/api/items", authMiddleware, async (req, res) => {
   try {
+    const user = await User.findById(req.user.userId);
+
     const newItem = new Item({
       ...req.body,
-      postedBy: req.user.userId
+      postedBy: req.user.userId,
+      // If contact type is school email, save the actual email so it can be displayed
+      contactEmail: req.body.contactType === "school_email" ? user.email : ""
     });
     await newItem.save();
     res.json(newItem);
@@ -62,7 +66,6 @@ app.patch("/api/items/:id/resolve", authMiddleware, async (req, res) => {
     const item = await Item.findById(req.params.id);
     if (!item) return res.status(404).json({ error: "Item not found" });
 
-    // Check if user is owner or admin
     const user = await User.findById(req.user.userId);
     const isOwner = item.postedBy && item.postedBy.toString() === req.user.userId;
     const isAdmin = user && user.isAdmin;

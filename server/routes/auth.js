@@ -27,7 +27,6 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ error: "Please fill in all required fields" });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
@@ -43,10 +42,8 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ error: "Index number already registered" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
     const user = new User({
       name,
       email,
@@ -54,7 +51,8 @@ router.post("/signup", async (req, res) => {
       indexNumber,
       indexNumberNormalized: normalizedIndexNumber,
       department,
-      level
+      level,
+      role: "student"
     });
     await user.save();
 
@@ -72,7 +70,6 @@ router.post("/login", async (req, res) => {
     const loginId = String(email || "").trim();
     const normalizedLoginId = normalizeIndexNumber(loginId);
 
-    // Find user
     let user = await User.findOne({
       $or: [
         { email: loginId },
@@ -92,16 +89,20 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
-    // Create token
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
 
-    res.json({ token, name: user.name, isAdmin: user.isAdmin }); // ← added isAdmin
+    res.json({
+      token,
+      name: user.name,
+      isAdmin: user.isAdmin,
+      email: user.email,
+      role: user.role || "student"
+    });
 
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -115,7 +116,6 @@ router.get("/me", authMiddleware, async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -132,15 +132,11 @@ router.post("/forgot-password", async (req, res) => {
       return res.status(400).json({ error: "No account found with that email" });
     }
 
-    // Generate temporary password
     const tempPassword = Math.random().toString(36).slice(-8);
-
-    // Hash and save it
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
     user.password = hashedPassword;
     await user.save();
 
-    // Send email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -181,7 +177,7 @@ router.post("/change-password", async (req, res) => {
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Old password is incorrect" });
+      return res.status(400).json({ error: "Current password is incorrect" });
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
