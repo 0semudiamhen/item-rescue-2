@@ -7,7 +7,7 @@ const nodemailer = require("nodemailer");
 const authMiddleware = require("../middleware/auth");
 require("dotenv").config();
 
-const JWT_SECRET = "lostfound_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 function normalizeIndexNumber(indexNumber) {
   return String(indexNumber || "").replace(/[\/\s-]/g, "").toUpperCase();

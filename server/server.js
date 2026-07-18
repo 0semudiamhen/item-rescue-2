@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -98,7 +99,7 @@ app.delete("/api/items/:id", authMiddleware, async (req, res) => {
 });
 
 // Connect to MongoDB + Start server
-mongoose.connect("mongodb+srv://raptor2322_db_user:joseph2002@cluster0.7kbwgqt.mongodb.net/?appName=Cluster0")
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("MongoDB Connected");
     app.listen(8000, () => console.log("Server running on port 8000"));
