@@ -36,11 +36,12 @@ if (signupForm) {
       name: document.getElementById("name").value,
       email: document.getElementById("email").value,
       indexNumber: document.getElementById("indexNumber").value,
+      school: document.getElementById("school").value,
       department: document.getElementById("department").value,
       level: document.getElementById("level").value,
       password: document.getElementById("password").value
     };
-
+    
     try {
       const res = await fetch("http://localhost:8000/api/auth/signup", {
         method: "POST",

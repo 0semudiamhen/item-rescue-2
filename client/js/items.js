@@ -76,6 +76,7 @@ function renderItems(items) {
       ${studentServicesBanner}
       <p><span>Category:</span> ${item.category || "N/A"}</p>
       <p><span>Location:</span> ${item.location || "N/A"}</p>
+      <p><span>Date:</span> ${item.dateOccurred ? new Date(item.dateOccurred).toLocaleDateString() : "N/A"}</p>
       <p><span>Description:</span> ${item.description}</p>
       <p><span>Contact:</span> ${contactInfo || "N/A"}</p>
       ${contactAction}
@@ -164,13 +165,22 @@ if (form) {
 
   const typeSelect = document.getElementById("type");
   const studentServicesDiv = document.getElementById("studentServicesDiv");
+  const dateOccurredLabel = document.getElementById("dateOccurredLabel");
+  const dateOccurredInput = document.getElementById("dateOccurred");
+
+  // Set max date to today so users can't pick a future date
+  if (dateOccurredInput) {
+    dateOccurredInput.max = new Date().toISOString().split("T")[0];
+  }
 
   if (typeSelect) {
     typeSelect.addEventListener("change", () => {
       if (typeSelect.value === "found") {
         studentServicesDiv.style.display = "block";
+        if (dateOccurredLabel) dateOccurredLabel.textContent = "Date Found";
       } else {
         studentServicesDiv.style.display = "none";
+        if (dateOccurredLabel) dateOccurredLabel.textContent = "Date Lost";
       }
     });
   }
@@ -211,6 +221,7 @@ if (form) {
       category: selectedCategory === "Other" ? customCategory : selectedCategory,
       location: document.getElementById("location").value,
       type: document.getElementById("type").value,
+      dateOccurred: document.getElementById("dateOccurred").value || null,
       takenToStudentServices: document.getElementById("takenToStudentServices")
         ? document.getElementById("takenToStudentServices").checked
         : false,

@@ -16,7 +16,7 @@ function normalizeIndexNumber(indexNumber) {
 // SIGNUP
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password, indexNumber, department, level } = req.body;
+    const { name, email, password, indexNumber, school, department, level } = req.body;
     const normalizedIndexNumber = normalizeIndexNumber(indexNumber);
 
     if (!email || !email.endsWith("@central.edu.gh")) {
@@ -50,10 +50,12 @@ router.post("/signup", async (req, res) => {
       password: hashedPassword,
       indexNumber,
       indexNumberNormalized: normalizedIndexNumber,
+      school,
       department,
       level,
       role: "student"
     });
+    
     await user.save();
 
     // Auto-login: generate token immediately after signup

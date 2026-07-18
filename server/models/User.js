@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
     sparse: true,
     trim: true
   },
+  school: {
+    type: String,
+    trim: true
+  },
   department: {
     type: String,
     trim: true
@@ -33,6 +37,10 @@ const userSchema = new mongoose.Schema({
   level: {
     type: String,
     trim: true
+  },
+  role: {
+    type: String,
+    default: "student"
   },
   isAdmin: {
     type: Boolean,

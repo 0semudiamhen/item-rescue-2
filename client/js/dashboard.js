@@ -55,6 +55,7 @@ fetch("http://localhost:8000/api/items/mine", {
         ${studentServicesBanner}
         <p><span>Category:</span> ${item.category || "N/A"}</p>
         <p><span>Location:</span> ${item.location || "N/A"}</p>
+        <p><span>Date:</span> ${item.dateOccurred ? new Date(item.dateOccurred).toLocaleDateString() : "N/A"}</p>
         <p><span>Description:</span> ${item.description}</p>
         <p><span>Contact:</span> ${contactInfo || "N/A"}</p>
         <br>

@@ -47,6 +47,7 @@ if (adminItemsContainer) {
           ${studentServicesBanner}
           <p><span>Category:</span> ${item.category || "N/A"}</p>
           <p><span>Location:</span> ${item.location || "N/A"}</p>
+          <p><span>Date:</span> ${item.dateOccurred ? new Date(item.dateOccurred).toLocaleDateString() : "N/A"}</p>
           <p><span>Description:</span> ${item.description}</p>
           <p><span>Posted By:</span> ${item.postedBy ? item.postedBy.name : "Unknown"} (${item.postedBy ? item.postedBy.email : "N/A"})</p>
           <div class="btn-group">
@@ -85,6 +86,7 @@ if (adminUsersContainer) {
           <p><span>Email:</span> ${user.email}</p>
           <p><span>Index Number:</span> ${user.indexNumber || "N/A"}</p>
           <p><span>Login ID:</span> ${user.indexNumberNormalized || "N/A"}</p>
+          <p><span>School / Faculty:</span> ${user.school || "N/A"}</p>
           <p><span>Department:</span> ${user.department || "N/A"}</p>
           <p><span>Level:</span> ${user.level || "N/A"}</p>
           <p><span>Admin:</span> ${user.isAdmin ? "Yes" : "No"}</p>

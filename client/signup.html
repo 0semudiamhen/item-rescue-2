@@ -19,31 +19,37 @@
 
     <form id="signupForm">
       <input type="text" id="name" placeholder="Full Name" required>
-      <input type="email" id="email" placeholder="Email Address" required>
+      <input type="email" id="email" placeholder="School Email Address" required>
       <input type="text" id="indexNumber" placeholder="Index Number / Student ID" required>
-      <select id="department" required>
-        <option value="">Select Department</option>
-        <option value="Accounting">Accounting</option>
-        <option value="Banking and Finance">Banking and Finance</option>
-        <option value="Business Administration">Business Administration</option>
-        <option value="Computer Science">Computer Science</option>
-        <option value="Economics">Economics</option>
-        <option value="Human Resource Management">Human Resource Management</option>
-        <option value="Information Technology">Information Technology</option>
-        <option value="Law">Law</option>
-        <option value="Marketing">Marketing</option>
-        <option value="Nursing">Nursing</option>
-        <option value="Physician Assistantship">Physician Assistantship</option>
-        <option value="Public Health">Public Health</option>
-        <option value="Other">Other</option>
+
+      <select id="school" required>
+        <option value="">Select School / Faculty</option>
+        <option value="Central Law School">Central Law School</option>
+        <option value="Faculty of Arts and Social Sciences">Faculty of Arts and Social Sciences</option>
+        <option value="Central Business School">Central Business School</option>
+        <option value="School of Pharmacy">School of Pharmacy</option>
+        <option value="School of Architecture and Design">School of Architecture and Design</option>
+        <option value="School of Engineering and Technology">School of Engineering and Technology</option>
+        <option value="School of Medical Sciences">School of Medical Sciences</option>
+        <option value="School of Nursing and Midwifery">School of Nursing and Midwifery</option>
+        <option value="School of Graduate Studies and Research">School of Graduate Studies and Research</option>
       </select>
+
+      <select id="department" required disabled>
+        <option value="">Select Programme</option>
+      </select>
+
       <select id="level" required>
         <option value="">Select Level / Year</option>
         <option value="Level 100">Level 100</option>
         <option value="Level 200">Level 200</option>
         <option value="Level 300">Level 300</option>
         <option value="Level 400">Level 400</option>
+        <option value="Level 500">Level 500</option>
+        <option value="Level 600">Level 600</option>
+        <option value="Postgraduate">Postgraduate</option>
       </select>
+
       <input type="password" id="password" placeholder="Password" required>
       <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
       <button type="submit">Create Account</button>
@@ -56,5 +62,105 @@
 
   <script src="js/ui.js"></script>
   <script src="js/auth.js"></script>
+  <script>
+    // School to programmes mapping
+    const programmes = {
+      "Central Law School": [
+        "Bachelor of Laws",
+        "Bachelor of Law and Economics",
+        "Bachelor of Law with Economics",
+        "Diploma in Law",
+        "Diploma in Paralegal Studies"
+      ],
+      "Faculty of Arts and Social Sciences": [
+        "BSc Economics and Computer Science",
+        "BSc Economics with Computer Science",
+        "BSc Economics and IT",
+        "BSc Economics with IT",
+        "BSc Economics with Law",
+        "BA Communication and Media Studies",
+        "BSc Psychology",
+        "BA Sociology",
+        "BA Social Work",
+        "Bachelor of Divinity",
+        "BA Guidance and Counselling"
+      ],
+      "Central Business School": [
+        "BSc Management Studies",
+        "BSc Banking and Finance",
+        "BSc Finance with Economics",
+        "BSc Business Administration - Marketing",
+        "BSc Business Administration - Human Resource Management",
+        "BSc Business Administration - Accounting"
+      ],
+      "School of Pharmacy": [
+        "Doctor of Pharmacy",
+        "Doctor of Pharmacy (Top Up)"
+      ],
+      "School of Architecture and Design": [
+        "Bachelor of Architecture",
+        "BSc Planning",
+        "BSc Real Estate",
+        "BSc Graphic Design",
+        "BSc Landscape Design",
+        "BSc Interior Design",
+        "BSc Fashion Design"
+      ],
+      "School of Engineering and Technology": [
+        "BSc Computer Science",
+        "BSc Civil Engineering",
+        "BSc Information Technology",
+        "BSc Computer Science with Economics",
+        "BSc IT with Economics"
+      ],
+      "School of Medical Sciences": [
+        "Bachelor of Public Health"
+      ],
+      "School of Nursing and Midwifery": [
+        "BSc Nursing"
+      ],
+      "School of Graduate Studies and Research": [
+        "Master of Public Health",
+        "MA Sacred Ministry",
+        "MA Religious Studies",
+        "MA Guidance and Counselling",
+        "MSc/MPhil Accounting",
+        "MSc Finance",
+        "MSc Monitoring, Evaluation and Impact Assessment",
+        "MBA - Project Management",
+        "MBA - Finance",
+        "MBA - Human Resource Management",
+        "MBA - General Management",
+        "MPhil Theology",
+        "MPhil Guidance and Counselling",
+        "MSc Nursing",
+        "MPhil Nursing",
+        "PhD Finance",
+        "PhD Human Resource Management and Organisational Leadership",
+        "Doctor of Ministry",
+        "Doctor of Business Administration (DBA)"
+      ]
+    };
+
+    const schoolSelect = document.getElementById("school");
+    const deptSelect = document.getElementById("department");
+
+    schoolSelect.addEventListener("change", () => {
+      const selected = schoolSelect.value;
+      deptSelect.innerHTML = `<option value="">Select Programme</option>`;
+
+      if (selected && programmes[selected]) {
+        programmes[selected].forEach(prog => {
+          const option = document.createElement("option");
+          option.value = prog;
+          option.textContent = prog;
+          deptSelect.appendChild(option);
+        });
+        deptSelect.disabled = false;
+      } else {
+        deptSelect.disabled = true;
+      }
+    });
+  </script>
 </body>
 </html>

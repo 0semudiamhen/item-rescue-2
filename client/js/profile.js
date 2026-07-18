@@ -33,6 +33,8 @@ fetch("http://localhost:8000/api/auth/me", {
     document.getElementById("profileIndexNumber").textContent = user.indexNumber || "N/A";
     document.getElementById("profileLoginId").textContent = user.indexNumberNormalized || "N/A";
     document.getElementById("profileDepartment").textContent = user.department || "N/A";
+    document.getElementById("profileSchool") && 
+    (document.getElementById("profileSchool").textContent = user.school || "N/A");
     document.getElementById("profileLevel").textContent = user.level || "N/A";
     document.getElementById("profileRole").textContent = user.isAdmin ? "Admin" : "Student";
     document.getElementById("profileJoined").textContent = user.createdAt

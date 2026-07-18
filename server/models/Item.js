@@ -12,6 +12,9 @@ const itemSchema = new mongoose.Schema({
     enum: ["active", "resolved"],
     default: "active"
   },
+  dateOccurred: {
+    type: Date
+  }, // date item was actually lost or found
   takenToStudentServices: {
     type: Boolean,
     default: false
