@@ -56,7 +56,18 @@ router.post("/signup", async (req, res) => {
     });
     await user.save();
 
-    res.json({ message: "Account created successfully" });
+    // Auto-login: generate token immediately after signup
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
+
+    res.json({
+      message: "Account created successfully",
+      token,
+      name: user.name,
+      isAdmin: user.isAdmin || false,
+      email: user.email,
+      role: user.role || "student",
+      isNewUser: true  // flag so frontend knows to show how-to page
+    });
 
   } catch (error) {
     res.status(500).json({ error: error.message });

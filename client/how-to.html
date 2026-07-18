@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>How It Works - CU Item Rescue</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="logo">
+      <img src="images/logo.png" alt="Central University Logo">
+      Item Rescue
+    </a>
+
+    <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">&#9776;</button>
+
+    <div class="nav-right" id="navRight">
+      <span id="welcomeMsg"></span>
+
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-trigger" aria-haspopup="true" aria-expanded="false">
+          My Account ▾
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="profile.html">My Profile</a>
+          <a href="dashboard.html">My Dashboard</a>
+          <a href="how-to.html">How It Works</a>
+        </div>
+      </div>
+
+      <a href="post-item.html" class="nav-post-btn">+ Post an Item</a>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1>Welcome to CU Item Rescue</h1>
+    <p>Here's how to get the most out of the platform</p>
+  </div>
+
+  <div class="container">
+    <div class="how-to-grid">
+
+      <div class="how-to-card">
+        <div class="how-to-number">01</div>
+        <h3>Lost something?</h3>
+        <p>Before posting a lost item, <strong>search the main page first</strong>. Someone may have already found it and posted it. Use the search bar or filter by category to look for your item.</p>
+      </div>
+
+      <div class="how-to-card">
+        <div class="how-to-number">02</div>
+        <h3>Found something?</h3>
+        <p>Before posting a found item, <strong>check if the owner has already reported it as lost</strong>. Switch to the Lost filter and search for the item. If you find a match, contact the owner directly.</p>
+      </div>
+
+      <div class="how-to-card">
+        <div class="how-to-number">03</div>
+        <h3>Posting an item</h3>
+        <p>If no match is found, go ahead and post the item. Be as descriptive as possible — include the category, location, and a clear description. Choose how you want to be contacted.</p>
+      </div>
+
+      <div class="how-to-card">
+        <div class="how-to-number">04</div>
+        <h3>Student Services</h3>
+        <p>If you found an item and handed it to <strong>Student Services</strong> (Cafeteria Building, adjacent to the International Student Office), mark this when posting so the owner knows where to go.</p>
+      </div>
+
+      <div class="how-to-card">
+        <div class="how-to-number">05</div>
+        <h3>Item recovered?</h3>
+        <p>Once your item has been found or returned, go to <strong>My Dashboard</strong> and mark it as resolved. This removes it from the listing so others know it has been recovered.</p>
+      </div>
+
+      <div class="how-to-card">
+        <div class="how-to-number">06</div>
+        <h3>Stay responsible</h3>
+        <p>Only post items you have genuinely lost or found on campus. Keep your contact information accurate so others can reach you easily.</p>
+      </div>
+
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="index.html" class="how-to-cta">Got it — Take me to the platform</a>
+    </div>
+  </div>
+
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -51,9 +51,12 @@ if (signupForm) {
       const data = await res.json();
 
       if (res.ok) {
-        notify("Account created. Please login.", "success");
+        // Auto-login — save session using localStorage by default for new users
+        saveSession(data, true);
+        notify(`Welcome to CU Item Rescue, ${data.name}!`, "success");
         setTimeout(() => {
-          window.location.href = "login.html";
+          // Redirect to how-to page on first signup
+          window.location.href = "how-to.html";
         }, 700);
       } else {
         notify(data.error, "error");
