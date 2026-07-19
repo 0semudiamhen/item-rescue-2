@@ -972,3 +972,47 @@ nav .logo img {
 .how-to-cta:hover {
   background-color: var(--dark-red);
 }
+
+/* ADMIN STATS */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+  margin-bottom: 32px;
+}
+
+.admin-stat-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--soft-shadow);
+  border-top: 4px solid var(--dark);
+}
+
+.admin-stat-card.lost {
+  border-top-color: var(--red);
+}
+
+.admin-stat-card.found {
+  border-top-color: var(--green);
+}
+
+.admin-stat-card span {
+  display: block;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 42px;
+  color: var(--dark);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.admin-stat-card strong {
+  display: block;
+  font-size: 13px;
+  color: var(--gray);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

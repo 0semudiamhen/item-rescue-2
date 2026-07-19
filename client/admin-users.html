@@ -11,23 +11,17 @@
       <img src="images/logo.png" alt="Central University Logo">
       Item Rescue
     </a>
-
     <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">&#9776;</button>
-
     <div class="nav-right" id="navRight">
       <span id="welcomeMsg"></span>
-
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger" aria-haspopup="true" aria-expanded="false">
-          My Account ▾
-        </button>
+        <button class="nav-dropdown-trigger" aria-haspopup="true" aria-expanded="false">My Account ▾</button>
         <div class="nav-dropdown-menu">
           <a href="profile.html">My Profile</a>
           <a href="dashboard.html">My Dashboard</a>
           <a href="how-to.html">How It Works</a>
         </div>
       </div>
-
       <a href="post-item.html" class="nav-post-btn">+ Post an Item</a>
       <button id="logoutBtn">Logout</button>
     </div>
@@ -41,6 +35,16 @@
   <div class="container">
     <p class="section-title">All Users</p>
     <p class="section-subtitle">View student identifiers, departments, levels, and roles</p>
+
+    <div class="search-bar">
+      <input type="text" id="adminUserSearch" placeholder="Search by name, email or index number...">
+      <select id="adminUserFilter">
+        <option value="all">All Users</option>
+        <option value="admin">Admins Only</option>
+        <option value="student">Students Only</option>
+      </select>
+    </div>
+
     <div id="adminUsersList" class="items-grid"></div>
   </div>
 

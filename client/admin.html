@@ -11,23 +11,17 @@
       <img src="images/logo.png" alt="Central University Logo">
       Item Rescue
     </a>
-
     <button class="nav-hamburger" id="navHamburger" aria-label="Open menu">&#9776;</button>
-
     <div class="nav-right" id="navRight">
       <span id="welcomeMsg"></span>
-
       <div class="nav-dropdown">
-        <button class="nav-dropdown-trigger" aria-haspopup="true" aria-expanded="false">
-          My Account ▾
-        </button>
+        <button class="nav-dropdown-trigger" aria-haspopup="true" aria-expanded="false">My Account ▾</button>
         <div class="nav-dropdown-menu">
           <a href="profile.html">My Profile</a>
           <a href="dashboard.html">My Dashboard</a>
           <a href="how-to.html">How It Works</a>
         </div>
       </div>
-
       <a href="post-item.html" class="nav-post-btn">+ Post an Item</a>
       <button id="logoutBtn">Logout</button>
     </div>
@@ -39,23 +33,57 @@
   </div>
 
   <div class="container">
+
+    <!-- Stats -->
+    <p class="section-title">Overview</p>
+    <p class="section-subtitle">Live platform statistics</p>
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <span id="statTotalUsers">—</span>
+        <strong>Total Users</strong>
+      </div>
+      <div class="admin-stat-card">
+        <span id="statTotalItems">—</span>
+        <strong>Total Items</strong>
+      </div>
+      <div class="admin-stat-card">
+        <span id="statActiveItems">—</span>
+        <strong>Active Items</strong>
+      </div>
+      <div class="admin-stat-card">
+        <span id="statResolvedItems">—</span>
+        <strong>Resolved Items</strong>
+      </div>
+      <div class="admin-stat-card lost">
+        <span id="statLostItems">—</span>
+        <strong>Active Lost</strong>
+      </div>
+      <div class="admin-stat-card found">
+        <span id="statFoundItems">—</span>
+        <strong>Active Found</strong>
+      </div>
+    </div>
+
+    <br>
+
+    <!-- Navigation -->
     <p class="section-title">Admin Tools</p>
     <p class="section-subtitle">Choose what you want to manage</p>
-
     <div class="admin-menu-grid">
       <a href="admin-items.html" class="admin-menu-card">
         <span>Items</span>
         <strong>Manage posted lost and found items</strong>
       </a>
-
       <a href="admin-users.html" class="admin-menu-card">
         <span>Users</span>
         <strong>View registered users and account details</strong>
       </a>
     </div>
+
   </div>
 
   <script src="js/ui.js"></script>
+  <script src="js/admin.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

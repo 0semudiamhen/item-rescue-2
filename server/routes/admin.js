@@ -13,6 +13,30 @@ const adminMiddleware = async (req, res, next) => {
   next();
 };
 
+// Get stats
+router.get("/stats", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalItems = await Item.countDocuments();
+    const activeItems = await Item.countDocuments({
+      $or: [{ status: "active" }, { status: { $exists: false } }]
+    });
+    const resolvedItems = await Item.countDocuments({ status: "resolved" });
+    const lostItems = await Item.countDocuments({
+      type: "lost",
+      $or: [{ status: "active" }, { status: { $exists: false } }]
+    });
+    const foundItems = await Item.countDocuments({
+      type: "found",
+      $or: [{ status: "active" }, { status: { $exists: false } }]
+    });
+
+    res.json({ totalUsers, totalItems, activeItems, resolvedItems, lostItems, foundItems });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get all users
 router.get("/users", authMiddleware, adminMiddleware, async (req, res) => {
   try {
