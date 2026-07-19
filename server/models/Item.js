@@ -6,7 +6,8 @@ const itemSchema = new mongoose.Schema({
   category: String,
   location: String,
   type: String, // lost or found
-  image: String,
+  image: String, // cloudinary url
+  imagePublicId: String, // cloudinary public_id for deletion
   status: {
     type: String,
     enum: ["active", "resolved"],
@@ -14,14 +15,14 @@ const itemSchema = new mongoose.Schema({
   },
   dateOccurred: {
     type: Date
-  }, // date item was actually lost or found
+  },
   takenToStudentServices: {
     type: Boolean,
     default: false
   },
-  contactType: String, // school_email, personal_email, phone
+  contactType: String,
   contactValue: String,
-  contactEmail: String, // stores actual email when contactType is school_email
+  contactEmail: String,
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"

@@ -7,6 +7,7 @@ const User = require("./models/User");
 const authRoutes = require("./routes/auth");
 const authMiddleware = require("./middleware/auth");
 const adminRoutes = require("./routes/admin");
+const { upload, cloudinary } = require("./config/cloudinary");
 
 const app = express();
 
@@ -21,16 +22,17 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Create item (protected)
-app.post("/api/items", authMiddleware, async (req, res) => {
+// Create item with optional image (protected)
+app.post("/api/items", authMiddleware, upload.single("image"), async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
 
     const newItem = new Item({
       ...req.body,
       postedBy: req.user.userId,
-      // If contact type is school email, save the actual email so it can be displayed
-      contactEmail: req.body.contactType === "school_email" ? user.email : ""
+      contactEmail: req.body.contactType === "school_email" ? user.email : "",
+      image: req.file ? req.file.path : "",
+      imagePublicId: req.file ? req.file.filename : ""
     });
     await newItem.save();
     res.json(newItem);
@@ -83,7 +85,7 @@ app.patch("/api/items/:id/resolve", authMiddleware, async (req, res) => {
   }
 });
 
-// Delete item (owner only)
+// Delete item (owner only) — also deletes image from Cloudinary
 app.delete("/api/items/:id", authMiddleware, async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
@@ -91,6 +93,17 @@ app.delete("/api/items/:id", authMiddleware, async (req, res) => {
     if (item.postedBy.toString() !== req.user.userId) {
       return res.status(401).json({ error: "Not authorized" });
     }
+
+    // Delete image from Cloudinary if it exists
+    if (item.imagePublicId) {
+      try {
+        await cloudinary.uploader.destroy(item.imagePublicId);
+      } catch (cloudErr) {
+        console.error("Cloudinary delete error:", cloudErr.message);
+        // Don't block item deletion if Cloudinary fails
+      }
+    }
+
     await item.deleteOne();
     res.json({ message: "Item deleted" });
   } catch (error) {

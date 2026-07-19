@@ -49,6 +49,7 @@ fetch("http://localhost:8000/api/items/mine", {
         : `<p style="color: green; font-weight: 700;">✅ This item has been resolved</p>`;
 
       div.innerHTML = `
+        ${item.image ? `<img src="${item.image}" class="item-card-image">` : ""}
         <h3>${item.title}</h3>
         <span class="badge ${item.type}">${item.type}</span>
         ${statusBadge}

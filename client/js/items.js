@@ -49,20 +49,20 @@ function renderItems(items) {
     const div = document.createElement("div");
     div.classList.add("item-card");
 
-    // Contact info — show actual email if school email selected
+    // Contact info
     let contactInfo = "";
     let contactAction = "";
     if (item.contactType === "school_email") {
       contactInfo = item.contactEmail || "School Email on file";
       if (item.contactEmail) {
-        contactAction = `<a href="mailto:${item.contactEmail}" class="contact-btn">✉ Send Email</a>`;
+        contactAction = `<a href="mailto:${item.contactEmail}" class="contact-btn email-btn">✉ Send Email</a>`;
       }
     } else if (item.contactType === "personal_email") {
       contactInfo = item.contactValue;
-      contactAction = `<a href="mailto:${item.contactValue}" class="contact-btn">✉ Send Email</a>`;
+      contactAction = `<a href="mailto:${item.contactValue}" class="contact-btn email-btn">✉ Send Email</a>`;
     } else if (item.contactType === "phone") {
       contactInfo = item.contactValue;
-      contactAction = `<a href="tel:${item.contactValue}" class="contact-btn">📞 Call</a>`;
+      contactAction = `<a href="tel:${item.contactValue}" class="contact-btn phone-btn">📞 Call</a>`;
     }
 
     // Student services banner
@@ -70,7 +70,13 @@ function renderItems(items) {
       ? `<p class="student-services-badge">📦 Handed to Student Services — Cafeteria Building, adjacent to International Student Office</p>`
       : "";
 
+    // Image
+    const itemImage = item.image
+      ? `<img src="${item.image}" alt="${item.title}" class="item-card-image">`
+      : "";
+
     div.innerHTML = `
+      ${itemImage}
       <h3>${item.title}</h3>
       <span class="badge ${item.type}">${item.type}</span>
       ${studentServicesBanner}
@@ -112,13 +118,11 @@ fetch("http://localhost:8000/api/items")
     updateFilterCounts();
     renderItems(allItems);
 
-    // Search input
     const searchInput = document.getElementById("searchInput");
     if (searchInput) {
       searchInput.addEventListener("input", applyFilters);
     }
 
-    // Filter switch
     const filterSwitch = document.getElementById("itemFilterSwitch");
     const toggleBtns = document.querySelectorAll(".toggle-btn");
     toggleBtns.forEach(btn => {
@@ -146,6 +150,7 @@ const form = document.getElementById("itemForm");
 
 if (form) {
 
+  // Category dropdown
   const categorySelect = document.getElementById("category");
   const otherCategoryDiv = document.getElementById("otherCategoryDiv");
   const otherCategoryInput = document.getElementById("otherCategory");
@@ -163,12 +168,12 @@ if (form) {
     });
   }
 
+  // Type select — student services and date label
   const typeSelect = document.getElementById("type");
   const studentServicesDiv = document.getElementById("studentServicesDiv");
   const dateOccurredLabel = document.getElementById("dateOccurredLabel");
   const dateOccurredInput = document.getElementById("dateOccurred");
 
-  // Set max date to today so users can't pick a future date
   if (dateOccurredInput) {
     dateOccurredInput.max = new Date().toISOString().split("T")[0];
   }
@@ -185,6 +190,7 @@ if (form) {
     });
   }
 
+  // Contact type
   const contactType = document.getElementById("contactType");
   const contactInputDiv = document.getElementById("contactInputDiv");
 
@@ -199,6 +205,25 @@ if (form) {
       }
     });
   }
+
+  // Image preview — handles both file upload and camera capture
+    function handleImageInput(input) {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          imagePreview.innerHTML = `<img src="${e.target.result}" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-top:8px;">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    const imageUpload = document.getElementById("imageUpload");
+    const imageCapture = document.getElementById("imageCapture");
+    const imagePreview = document.getElementById("imagePreview");
+
+    if (imageUpload) imageUpload.addEventListener("change", () => handleImageInput(imageUpload));
+    if (imageCapture) imageCapture.addEventListener("change", () => handleImageInput(imageCapture));
 
   console.log("Form found");
   form.addEventListener("submit", async (e) => {
@@ -215,30 +240,41 @@ if (form) {
       return;
     }
 
-    const item = {
-      title: document.getElementById("title").value,
-      description: document.getElementById("description").value,
-      category: selectedCategory === "Other" ? customCategory : selectedCategory,
-      location: document.getElementById("location").value,
-      type: document.getElementById("type").value,
-      dateOccurred: document.getElementById("dateOccurred").value || null,
-      takenToStudentServices: document.getElementById("takenToStudentServices")
+    const formData = new FormData();
+    formData.append("title", document.getElementById("title").value);
+    formData.append("description", document.getElementById("description").value);
+    formData.append("category", selectedCategory === "Other" ? customCategory : selectedCategory);
+    formData.append("location", document.getElementById("location").value);
+    formData.append("type", document.getElementById("type").value);
+    formData.append("dateOccurred", document.getElementById("dateOccurred").value || "");
+    formData.append("takenToStudentServices",
+      document.getElementById("takenToStudentServices")
         ? document.getElementById("takenToStudentServices").checked
-        : false,
-      contactType: document.getElementById("contactType").value,
-      contactValue: document.getElementById("contactValue")
+        : false
+    );
+    formData.append("contactType", document.getElementById("contactType").value);
+    formData.append("contactValue",
+      document.getElementById("contactValue")
         ? document.getElementById("contactValue").value
         : ""
-    };
+    );
+
+    const imageFile = (document.getElementById("imageCapture") && document.getElementById("imageCapture").files[0])
+  || (document.getElementById("imageUpload") && document.getElementById("imageUpload").files[0])
+  || null;
+
+if (imageFile) {
+  formData.append("image", imageFile);
+}
 
     try {
       const res = await fetch("http://localhost:8000/api/items", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           "Authorization": token
+          // No Content-Type — browser sets it automatically for FormData
         },
-        body: JSON.stringify(item)
+        body: formData
       });
 
       const data = await res.json();
@@ -246,6 +282,7 @@ if (form) {
 
       notify("Item posted successfully.", "success");
       form.reset();
+      if (imagePreview) imagePreview.innerHTML = "";
       setTimeout(() => {
         window.location.href = "index.html";
       }, 700);

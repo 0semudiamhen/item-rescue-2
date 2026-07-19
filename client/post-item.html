@@ -28,7 +28,6 @@
         </div>
       </div>
 
-      <a href="post-item.html" class="nav-post-btn">+ Post an Item</a>
       <button id="logoutBtn">Logout</button>
     </div>
   </nav>
@@ -87,6 +86,15 @@
 
       <!-- Dynamic contact input -->
       <div id="contactInputDiv"></div>
+
+      <!-- Image Upload -->
+      <div style="display:flex; gap:10px; margin-bottom:8px;">
+        <label for="imageUpload" class="upload-option-btn">📁 Choose Photo</label>
+        <label for="imageCapture" class="upload-option-btn">📷 Take Photo</label>
+      </div>
+      <input type="file" id="imageUpload" accept="image/jpeg, image/png, image/webp" style="display:none">
+      <input type="file" id="imageCapture" accept="image/jpeg, image/png, image/webp" capture="environment" style="display:none">
+      <div id="imagePreview" style="margin-bottom:16px;"></div>
 
       <button type="submit">Submit Item</button>
     </form>

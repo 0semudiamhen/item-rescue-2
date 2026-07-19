@@ -54,6 +54,7 @@ function renderAdminItems(items) {
       : `<p style="color: green; font-weight: 700;">✅ Resolved</p>`;
 
     div.innerHTML = `
+      ${item.image ? `<img src="${item.image}" class="item-card-image">` : ""}
       <h3>${item.title}</h3>
       <span class="badge ${item.type}">${item.type}</span>
       ${statusBadge}

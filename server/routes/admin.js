@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/User");
 const Item = require("../models/Item");
 const authMiddleware = require("../middleware/auth");
+const { cloudinary } = require("../config/cloudinary");
 
 // Admin check middleware
 const adminMiddleware = async (req, res, next) => {
@@ -67,10 +68,23 @@ router.get("/items", authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-// Delete any item
+// Delete any item (admin) — also deletes image from Cloudinary
 router.delete("/items/:id", authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    await Item.findByIdAndDelete(req.params.id);
+    const item = await Item.findById(req.params.id);
+    if (!item) return res.status(404).json({ error: "Item not found" });
+
+    // Delete image from Cloudinary if it exists
+    if (item.imagePublicId) {
+      try {
+        await cloudinary.uploader.destroy(item.imagePublicId);
+      } catch (cloudErr) {
+        console.error("Cloudinary delete error:", cloudErr.message);
+        // Don't block item deletion if Cloudinary fails
+      }
+    }
+
+    await item.deleteOne();
     res.json({ message: "Item deleted" });
   } catch (error) {
     res.status(500).json({ error: error.message });
