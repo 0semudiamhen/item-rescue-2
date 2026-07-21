@@ -1078,3 +1078,38 @@ nav .logo img {
   color: var(--white);
   border-color: var(--red);
 }
+
+.otp-info {
+  background: var(--off-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 1.5;
+}
+
+#otpInput {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 10px;
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+.resend-btn {
+  background: transparent;
+  border: none;
+  color: var(--red);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.resend-btn:hover {
+  color: var(--dark-red);
+}

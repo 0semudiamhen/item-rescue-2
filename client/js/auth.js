@@ -1,6 +1,5 @@
 console.log("auth.js connected");
 
-// Helper — saves to localStorage if remember me is checked, sessionStorage if not
 function saveSession(data, remember) {
   const storage = remember ? localStorage : sessionStorage;
   storage.setItem("token", data.token);
@@ -12,6 +11,9 @@ function saveSession(data, remember) {
 
 // SIGNUP
 const signupForm = document.getElementById("signupForm");
+const otpSection = document.getElementById("otpSection");
+const otpForm = document.getElementById("otpForm");
+let pendingEmail = "";
 
 if (signupForm) {
   signupForm.addEventListener("submit", async (e) => {
@@ -34,16 +36,16 @@ if (signupForm) {
 
     const user = {
       name: document.getElementById("name").value,
-      email: document.getElementById("email").value,
+      email,
       indexNumber: document.getElementById("indexNumber").value,
       school: document.getElementById("school").value,
       department: document.getElementById("department").value,
       level: document.getElementById("level").value,
-      password: document.getElementById("password").value
+      password
     };
-    
+
     try {
-      const res = await fetch("http://localhost:8000/api/auth/signup", {
+      const res = await fetch("http://localhost:8000/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(user)
@@ -52,11 +54,56 @@ if (signupForm) {
       const data = await res.json();
 
       if (res.ok) {
-        // Auto-login — save session using localStorage by default for new users
+        if (data.token) {
+          // OTP skipped — account created directly
+          saveSession(data, true);
+          notify(`Welcome to CU Item Rescue, ${data.name}!`, "success");
+          setTimeout(() => {
+            window.location.href = "how-to.html";
+          }, 700);
+        } else {
+          // OTP required — show OTP section
+          pendingEmail = email;
+          signupForm.style.display = "none";
+          if (otpSection) otpSection.style.display = "block";
+          notify(`Verification code sent to ${email}`, "success");
+        }
+      } else {
+        notify(data.error, "error");
+      }
+
+    } catch (err) {
+      console.error(err);
+      notify("Unable to send verification code right now.", "error");
+    }
+  });
+}
+
+// OTP VERIFICATION
+if (otpForm) {
+  otpForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const otp = document.getElementById("otpInput").value.trim();
+
+    if (!otp || otp.length !== 6) {
+      notify("Please enter the 6-digit code.", "error");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: pendingEmail, otp })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
         saveSession(data, true);
         notify(`Welcome to CU Item Rescue, ${data.name}!`, "success");
         setTimeout(() => {
-          // Redirect to how-to page on first signup
           window.location.href = "how-to.html";
         }, 700);
       } else {
@@ -65,7 +112,32 @@ if (signupForm) {
 
     } catch (err) {
       console.error(err);
-      notify("Unable to create account right now.", "error");
+      notify("Unable to verify code right now.", "error");
+    }
+  });
+}
+
+// Resend OTP
+const resendBtn = document.getElementById("resendOtp");
+if (resendBtn) {
+  resendBtn.addEventListener("click", async () => {
+    if (!pendingEmail) return;
+
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: pendingEmail, resend: true })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        notify("New verification code sent.", "success");
+      } else {
+        notify(data.error, "error");
+      }
+    } catch (err) {
+      notify("Unable to resend code right now.", "error");
     }
   });
 }

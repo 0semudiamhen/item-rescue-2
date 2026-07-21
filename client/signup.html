@@ -55,6 +55,20 @@
       <button type="submit">Create Account</button>
     </form>
 
+    <!-- OTP Section — outside the signup form -->
+    <div id="otpSection" style="display:none;">
+      <div class="otp-info">
+        <p>We sent a 6-digit verification code to your school email. Enter it below to complete your registration.</p>
+      </div>
+      <form id="otpForm">
+        <input type="text" id="otpInput" placeholder="Enter 6-digit code" maxlength="6" inputmode="numeric" required>
+        <button type="submit">Verify & Create Account</button>
+      </form>
+      <div style="text-align:center; margin-top:16px;">
+        <button id="resendOtp" class="resend-btn">Resend Code</button>
+      </div>
+    </div>
+
     <div class="switch-link">
       Already have an account? <a href="login.html">Login</a>
     </div>
@@ -63,7 +77,6 @@
   <script src="js/ui.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    // School to programmes mapping
     const programmes = {
       "Central Law School": [
         "Bachelor of Laws",

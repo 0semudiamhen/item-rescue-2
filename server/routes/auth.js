@@ -9,21 +9,114 @@ require("dotenv").config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// Temporary OTP store — { email: { otp, expiresAt, userData } }
+const otpStore = new Map();
+
 function normalizeIndexNumber(indexNumber) {
   return String(indexNumber || "").replace(/[\/\s-]/g, "").toUpperCase();
 }
 
-// SIGNUP
-router.post("/signup", async (req, res) => {
+function createTransporter() {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+}
+
+// SEND OTP (step 1 of signup)
+router.post("/send-otp", async (req, res) => {
   try {
-    const { name, email, password, indexNumber, school, department, level } = req.body;
+    
+    const SKIP_OTP = false; // Set to true to skip OTP verification for testing
+
+    if (SKIP_OTP) {
+      const { name, email, password, indexNumber, school, department, level } = req.body;
+      const normalizedIndexNumber = normalizeIndexNumber(indexNumber);
+
+      if (!email || !email.endsWith("@central.edu.gh")) {
+        return res.status(400).json({ error: "You must use your Central University email address" });
+      }
+
+      if (!name || !password || !normalizedIndexNumber || !department || !level || !school) {
+        return res.status(400).json({ error: "Please fill in all required fields" });
+      }
+
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+
+      const existingIndex = await User.findOne({
+        $or: [{ indexNumber }, { indexNumberNormalized: normalizedIndexNumber }]
+      });
+      if (existingIndex) {
+        return res.status(400).json({ error: "Index number already registered" });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = new User({
+        name, email, password: hashedPassword,
+        indexNumber, indexNumberNormalized: normalizedIndexNumber,
+        school, department, level, role: "student"
+      });
+      await user.save();
+
+      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
+      return res.json({
+        message: "Account created successfully",
+        token, name: user.name,
+        isAdmin: user.isAdmin || false,
+        email: user.email,
+        role: user.role || "student",
+        isNewUser: true
+      });
+    }
+
+    const { name, email, password, indexNumber, school, department, level, resend } = req.body;
+
+    // Handle resend — skip validation, just regenerate and resend
+    if (resend) {
+      const existingOtp = otpStore.get(email);
+      if (!existingOtp) {
+        return res.status(400).json({ error: "No signup in progress for this email. Please sign up again." });
+      }
+
+      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = Date.now() + 10 * 60 * 1000;
+      otpStore.set(email, { otp: newOtp, expiresAt, userData: existingOtp.userData });
+
+      const transporter = createTransporter();
+      await transporter.sendMail({
+        from: `"CU Item Rescue" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "Your New Verification Code - CU Item Rescue",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
+            <h2 style="color: #CC0000;">CU Item Rescue</h2>
+            <p>Your new verification code is:</p>
+            <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #CC0000; margin: 20px 0;">
+              ${newOtp}
+            </div>
+            <p>This code expires in <strong>10 minutes</strong>.</p>
+            <p>— CU Item Rescue Team</p>
+          </div>
+        `
+      });
+
+      return res.json({ message: "New verification code sent" });
+    }
+
+    // Normal signup flow
     const normalizedIndexNumber = normalizeIndexNumber(indexNumber);
 
     if (!email || !email.endsWith("@central.edu.gh")) {
       return res.status(400).json({ error: "You must use your Central University email address" });
     }
 
-    if (!name || !password || !normalizedIndexNumber || !department || !level) {
+    if (!name || !password || !normalizedIndexNumber || !department || !level || !school) {
       return res.status(400).json({ error: "Please fill in all required fields" });
     }
 
@@ -32,15 +125,70 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ error: "Email already registered" });
     }
 
-    const existingIndexNumber = await User.findOne({
-      $or: [
-        { indexNumber },
-        { indexNumberNormalized: normalizedIndexNumber }
-      ]
+    const existingIndex = await User.findOne({
+      $or: [{ indexNumber }, { indexNumberNormalized: normalizedIndexNumber }]
     });
-    if (existingIndexNumber) {
+    if (existingIndex) {
       return res.status(400).json({ error: "Index number already registered" });
     }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000;
+
+    otpStore.set(email, {
+      otp,
+      expiresAt,
+      userData: { name, email, password, indexNumber, normalizedIndexNumber, school, department, level }
+    });
+
+    const transporter = createTransporter();
+    await transporter.sendMail({
+      from: `"CU Item Rescue" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Your Verification Code - CU Item Rescue",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
+          <h2 style="color: #CC0000;">CU Item Rescue</h2>
+          <p>Hi ${name},</p>
+          <p>Your verification code is:</p>
+          <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #CC0000; margin: 20px 0;">
+            ${otp}
+          </div>
+          <p>This code expires in <strong>10 minutes</strong>.</p>
+          <p>If you did not request this, please ignore this email.</p>
+          <p>— CU Item Rescue Team</p>
+        </div>
+      `
+    });
+
+    res.json({ message: "Verification code sent to your school email" });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// VERIFY OTP AND CREATE ACCOUNT (step 2 of signup)
+router.post("/verify-otp", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const stored = otpStore.get(email);
+
+    if (!stored) {
+      return res.status(400).json({ error: "No verification code found. Please sign up again." });
+    }
+
+    if (Date.now() > stored.expiresAt) {
+      otpStore.delete(email);
+      return res.status(400).json({ error: "Verification code has expired. Please sign up again." });
+    }
+
+    if (stored.otp !== otp.trim()) {
+      return res.status(400).json({ error: "Incorrect verification code. Please try again." });
+    }
+
+    const { name, password, indexNumber, normalizedIndexNumber, school, department, level } = stored.userData;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -55,10 +203,10 @@ router.post("/signup", async (req, res) => {
       level,
       role: "student"
     });
-    
-    await user.save();
 
-    // Auto-login: generate token immediately after signup
+    await user.save();
+    otpStore.delete(email);
+
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
 
     res.json({
@@ -68,7 +216,7 @@ router.post("/signup", async (req, res) => {
       isAdmin: user.isAdmin || false,
       email: user.email,
       role: user.role || "student",
-      isNewUser: true  // flag so frontend knows to show how-to page
+      isNewUser: true
     });
 
   } catch (error) {
@@ -150,14 +298,7 @@ router.post("/forgot-password", async (req, res) => {
     user.password = hashedPassword;
     await user.save();
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    });
-
+    const transporter = createTransporter();
     await transporter.sendMail({
       from: `"CU Item Rescue" <${process.env.EMAIL_USER}>`,
       to: email,
