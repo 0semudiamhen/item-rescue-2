@@ -1,11 +1,14 @@
-// FORGOT PASSWORD
+let pendingResetEmail = "";
+
+// FORGOT PASSWORD — Step 1: send OTP
 const forgotForm = document.getElementById("forgotForm");
+const resetSection = document.getElementById("resetSection");
 
 if (forgotForm) {
   forgotForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById("email").value;
+    const email = document.getElementById("forgotEmail").value.trim();
 
     try {
       const res = await fetch("http://localhost:8000/api/auth/forgot-password", {
@@ -17,9 +20,57 @@ if (forgotForm) {
       const data = await res.json();
 
       if (res.ok) {
-        notify("Temporary password sent! Check your email.", "success");
+        pendingResetEmail = email;
+        forgotForm.style.display = "none";
+        if (resetSection) resetSection.style.display = "block";
+        const subtitle = document.getElementById("forgotSubtitle");
+        if (subtitle) subtitle.textContent = `Code sent to ${email}`;
+        notify("Verification code sent! Check your school email.", "success");
+      } else {
+        notify(data.error, "error");
+      }
+
+    } catch (err) {
+      console.error(err);
+      notify("Something went wrong. Please try again.", "error");
+    }
+  });
+}
+
+// FORGOT PASSWORD — Step 2: verify OTP and set new password
+const resetForm = document.getElementById("resetForm");
+
+if (resetForm) {
+  resetForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const otp = document.getElementById("resetOtp").value.trim();
+    const newPassword = document.getElementById("resetNewPassword").value;
+    const confirmPassword = document.getElementById("resetConfirmPassword").value;
+
+    if (newPassword !== confirmPassword) {
+      notify("Passwords do not match.", "error");
+      return;
+    }
+
+    if (otp.length !== 6) {
+      notify("Please enter the 6-digit code.", "error");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: pendingResetEmail, otp, newPassword })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        notify("Password reset successfully! Please login.", "success");
         setTimeout(() => {
-          window.location.href = "change-password.html";
+          window.location.href = "login.html";
         }, 1000);
       } else {
         notify(data.error, "error");
@@ -32,58 +83,113 @@ if (forgotForm) {
   });
 }
 
-// CHANGE PASSWORD
+// Resend reset OTP
+const resendResetBtn = document.getElementById("resendResetOtp");
+if (resendResetBtn) {
+  resendResetBtn.addEventListener("click", async () => {
+    if (!pendingResetEmail) return;
+
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: pendingResetEmail })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        notify("New verification code sent.", "success");
+      } else {
+        notify(data.error, "error");
+      }
+    } catch (err) {
+      notify("Unable to resend code right now.", "error");
+    }
+  });
+}
+
+// CHANGE PASSWORD — OTP flow for logged in users
+const requestOtpBtn = document.getElementById("requestOtpBtn");
+const changeOtpSection = document.getElementById("changeOtpSection");
+const requestOtpSection = document.getElementById("requestOtpSection");
+let changePasswordEmail = "";
+
+if (requestOtpBtn) {
+  // Get logged in user's email first
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "login.html";
+  }
+
+  // Fetch email from profile
+  fetch("http://localhost:8000/api/auth/me", {
+    headers: { "Authorization": token }
+  })
+    .then(res => res.json())
+    .then(user => {
+      changePasswordEmail = user.email;
+      const subtitle = document.getElementById("changeSubtitle");
+      if (subtitle) subtitle.textContent = `We'll send a code to ${user.email}`;
+    })
+    .catch(() => {});
+
+  requestOtpBtn.addEventListener("click", async () => {
+    if (!changePasswordEmail) {
+      notify("Could not find your email. Please try again.", "error");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: changePasswordEmail })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        requestOtpSection.style.display = "none";
+        changeOtpSection.style.display = "block";
+        notify("Verification code sent to your school email.", "success");
+      } else {
+        notify(data.error, "error");
+      }
+
+    } catch (err) {
+      console.error(err);
+      notify("Something went wrong. Please try again.", "error");
+    }
+  });
+}
+
+// Change password form — verify OTP and set new password
 const changeForm = document.getElementById("changeForm");
 
 if (changeForm) {
-  const token = localStorage.getItem("token");
-  const subtitle = document.getElementById("formSubtitle");
-  const emailInput = document.getElementById("email");
-  const oldPasswordLabel = document.getElementById("oldPassword");
-
-  // If user is already logged in, auto-fill email and adjust wording
-  if (token) {
-    fetch("http://localhost:8000/api/auth/me", {
-      headers: { "Authorization": token }
-    })
-      .then(res => res.json())
-      .then(user => {
-        if (user.email) {
-          emailInput.value = user.email;
-          emailInput.readOnly = true;
-          emailInput.style.opacity = "0.6";
-        }
-        if (subtitle) subtitle.textContent = "Enter your current password and choose a new one";
-        if (oldPasswordLabel) oldPasswordLabel.placeholder = "Current password";
-      })
-      .catch(() => {});
-  } else {
-    if (subtitle) subtitle.textContent = "Enter your temporary password and choose a new one";
-    if (oldPasswordLabel) oldPasswordLabel.placeholder = "Temporary password";
-  }
-
   changeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const otp = document.getElementById("changeOtp").value.trim();
     const newPassword = document.getElementById("newPassword").value;
     const confirmNewPassword = document.getElementById("confirmNewPassword").value;
 
     if (newPassword !== confirmNewPassword) {
-      notify("New passwords do not match!", "error");
+      notify("Passwords do not match.", "error");
       return;
     }
 
-    const credentials = {
-      email: document.getElementById("email").value,
-      oldPassword: document.getElementById("oldPassword").value,
-      newPassword: newPassword
-    };
+    if (otp.length !== 6) {
+      notify("Please enter the 6-digit code.", "error");
+      return;
+    }
 
     try {
-      const res = await fetch("http://localhost:8000/api/auth/change-password", {
+      const res = await fetch("http://localhost:8000/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials)
+        body: JSON.stringify({ email: changePasswordEmail, otp, newPassword })
       });
 
       const data = await res.json();
@@ -100,6 +206,31 @@ if (changeForm) {
     } catch (err) {
       console.error(err);
       notify("Something went wrong. Please try again.", "error");
+    }
+  });
+}
+
+// Resend change password OTP
+const resendChangeBtn = document.getElementById("resendChangeOtp");
+if (resendChangeBtn) {
+  resendChangeBtn.addEventListener("click", async () => {
+    if (!changePasswordEmail) return;
+
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: changePasswordEmail })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        notify("New verification code sent.", "success");
+      } else {
+        notify(data.error, "error");
+      }
+    } catch (err) {
+      notify("Unable to resend code right now.", "error");
     }
   });
 }

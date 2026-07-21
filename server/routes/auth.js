@@ -3,11 +3,34 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const nodemailer = require("nodemailer");
 const authMiddleware = require("../middleware/auth");
 require("dotenv").config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
+// Brevo API setup
+async function sendEmail(to, subject, html, name = "") {
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "accept": "application/json",
+      "api-key": process.env.BREVO_API_KEY,
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      sender: { name: "CU Item Rescue", email: process.env.EMAIL_USER },
+      to: [{ email: to, name: name || to }],
+      subject,
+      htmlContent: html
+    })
+  });
+
+  const data = await res.json();
+  if (!data.messageId) {
+    throw new Error(JSON.stringify(data));
+  }
+  return data;
+}
 
 // Temporary OTP store — { email: { otp, expiresAt, userData } }
 const otpStore = new Map();
@@ -16,21 +39,11 @@ function normalizeIndexNumber(indexNumber) {
   return String(indexNumber || "").replace(/[\/\s-]/g, "").toUpperCase();
 }
 
-function createTransporter() {
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-}
-
 // SEND OTP (step 1 of signup)
 router.post("/send-otp", async (req, res) => {
   try {
-    
-    const SKIP_OTP = false; // Set to true to skip OTP verification for testing
+
+    const SKIP_OTP = true; // Set to true to skip OTP verification
 
     if (SKIP_OTP) {
       const { name, email, password, indexNumber, school, department, level } = req.body;
@@ -77,7 +90,7 @@ router.post("/send-otp", async (req, res) => {
 
     const { name, email, password, indexNumber, school, department, level, resend } = req.body;
 
-    // Handle resend — skip validation, just regenerate and resend
+    // Handle resend
     if (resend) {
       const existingOtp = otpStore.get(email);
       if (!existingOtp) {
@@ -88,12 +101,10 @@ router.post("/send-otp", async (req, res) => {
       const expiresAt = Date.now() + 10 * 60 * 1000;
       otpStore.set(email, { otp: newOtp, expiresAt, userData: existingOtp.userData });
 
-      const transporter = createTransporter();
-      await transporter.sendMail({
-        from: `"CU Item Rescue" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: "Your New Verification Code - CU Item Rescue",
-        html: `
+      await sendEmail(
+        email,
+        "Your New Verification Code - CU Item Rescue",
+        `
           <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
             <h2 style="color: #CC0000;">CU Item Rescue</h2>
             <p>Your new verification code is:</p>
@@ -103,8 +114,9 @@ router.post("/send-otp", async (req, res) => {
             <p>This code expires in <strong>10 minutes</strong>.</p>
             <p>— CU Item Rescue Team</p>
           </div>
-        `
-      });
+        `,
+        existingOtp.userData.name
+      );
 
       return res.json({ message: "New verification code sent" });
     }
@@ -141,12 +153,10 @@ router.post("/send-otp", async (req, res) => {
       userData: { name, email, password, indexNumber, normalizedIndexNumber, school, department, level }
     });
 
-    const transporter = createTransporter();
-    await transporter.sendMail({
-      from: `"CU Item Rescue" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Your Verification Code - CU Item Rescue",
-      html: `
+    await sendEmail(
+      email,
+      "Your Verification Code - CU Item Rescue",
+      `
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
           <h2 style="color: #CC0000;">CU Item Rescue</h2>
           <p>Hi ${name},</p>
@@ -158,9 +168,11 @@ router.post("/send-otp", async (req, res) => {
           <p>If you did not request this, please ignore this email.</p>
           <p>— CU Item Rescue Team</p>
         </div>
-      `
-    });
+      `,
+      name
+    );
 
+    console.log("OTP sent to:", email, "OTP:", otp);
     res.json({ message: "Verification code sent to your school email" });
 
   } catch (error) {
@@ -193,14 +205,11 @@ router.post("/verify-otp", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
-      name,
-      email,
+      name, email,
       password: hashedPassword,
       indexNumber,
       indexNumberNormalized: normalizedIndexNumber,
-      school,
-      department,
-      level,
+      school, department, level,
       role: "student"
     });
 
@@ -283,7 +292,7 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 });
 
-// FORGOT PASSWORD
+// FORGOT PASSWORD — send OTP
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
@@ -293,26 +302,68 @@ router.post("/forgot-password", async (req, res) => {
       return res.status(400).json({ error: "No account found with that email" });
     }
 
-    const tempPassword = Math.random().toString(36).slice(-8);
-    const hashedPassword = await bcrypt.hash(tempPassword, 10);
-    user.password = hashedPassword;
-    await user.save();
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000;
 
-    const transporter = createTransporter();
-    await transporter.sendMail({
-      from: `"CU Item Rescue" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Your Temporary Password - CU Item Rescue",
-      html: `
-        <h2>Password Reset</h2>
-        <p>Hi ${user.name},</p>
-        <p>Your temporary password is: <strong>${tempPassword}</strong></p>
-        <p>Please login with this password and change it immediately.</p>
-        <p>— CU Item Rescue Team</p>
+    // Store reset OTP separately from signup OTP
+    otpStore.set(`reset_${email}`, { otp, expiresAt });
+
+    await sendEmail(
+      email,
+      "Password Reset Code - CU Item Rescue",
       `
-    });
+        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
+          <h2 style="color: #CC0000;">CU Item Rescue</h2>
+          <p>Hi ${user.name},</p>
+          <p>Your password reset code is:</p>
+          <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #CC0000; margin: 20px 0;">
+            ${otp}
+          </div>
+          <p>This code expires in <strong>10 minutes</strong>.</p>
+          <p>If you did not request this, please ignore this email.</p>
+          <p>— CU Item Rescue Team</p>
+        </div>
+      `,
+      user.name
+    );
 
-    res.json({ message: "Temporary password sent to your email" });
+    res.json({ message: "Verification code sent to your email" });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// VERIFY RESET OTP AND SET NEW PASSWORD
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    const stored = otpStore.get(`reset_${email}`);
+
+    if (!stored) {
+      return res.status(400).json({ error: "No reset code found. Please request a new one." });
+    }
+
+    if (Date.now() > stored.expiresAt) {
+      otpStore.delete(`reset_${email}`);
+      return res.status(400).json({ error: "Reset code has expired. Please request a new one." });
+    }
+
+    if (stored.otp !== otp.trim()) {
+      return res.status(400).json({ error: "Incorrect code. Please try again." });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "User not found." });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    otpStore.delete(`reset_${email}`);
+
+    res.json({ message: "Password reset successfully" });
 
   } catch (error) {
     res.status(500).json({ error: error.message });
