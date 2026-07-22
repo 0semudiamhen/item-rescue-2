@@ -806,26 +806,32 @@ nav .logo img {
 
 .toast-root {
   position: fixed;
-  right: 22px;
-  bottom: 22px;
-  z-index: 100;
-  display: grid;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 10px;
-  width: min(360px, calc(100vw - 32px));
+  width: min(420px, calc(100vw - 32px));
+  pointer-events: none;
 }
 
 .toast {
-  padding: 14px 16px;
-  border-radius: 10px;
+  padding: 14px 24px;
+  border-radius: 50px;
   background: var(--dark);
   color: var(--white);
-  box-shadow: 0 14px 28px rgba(26, 26, 26, 0.2);
+  box-shadow: 0 8px 24px rgba(26, 26, 26, 0.2);
   font-weight: 800;
   font-size: 14px;
   line-height: 1.4;
-  transform: translateY(10px);
+  text-align: center;
+  transform: translateY(-12px);
   opacity: 0;
   transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
 }
 
 .toast.show {
